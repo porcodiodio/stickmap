@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.stickers (
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
-    country_code VARCHAR(2), -- Code pays ISO 3166-1 alpha-2 (ex: 'FR', 'US')
+    country_code VARCHAR(3), -- Code pays ISO 3166-1 alpha-3 (ex: 'FRA', 'USA')
     photo_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -31,11 +31,11 @@ ON public.stickers FOR SELECT
 TO public 
 USING (true);
 
--- Politique : Uniquement les utilisateurs authentifiés peuvent ajouter un sticker
-CREATE POLICY "Utilisateurs authentifiés peuvent ajouter des stickers" 
+-- Politique : Tout le monde peut ajouter un sticker (Simplification pour MVP sans Auth complet)
+CREATE POLICY "Tout le monde peut ajouter des stickers" 
 ON public.stickers FOR INSERT 
-TO authenticated 
-WITH CHECK (auth.uid() = user_id);
+TO public 
+WITH CHECK (true);
 
 -- Politique : Les utilisateurs ne peuvent modifier/supprimer que LEURS propres stickers
 CREATE POLICY "Utilisateurs peuvent modifier leurs propres stickers" 
@@ -47,3 +47,21 @@ CREATE POLICY "Utilisateurs peuvent supprimer leurs propres stickers"
 ON public.stickers FOR DELETE 
 TO authenticated 
 USING (auth.uid() = user_id);
+
+-- 5. Politiques pour le Storage (Bucket 'stickers-photos')
+-- Note: Le bucket doit être créé manuellement en mode "Public" d'abord.
+-- Ces politiques permettent l'upload et la lecture sans authentification pour le MVP.
+
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('stickers-photos', 'stickers-photos', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Lecture publique des photos"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'stickers-photos');
+
+CREATE POLICY "Upload public des photos"
+ON storage.objects FOR INSERT
+TO public
+WITH CHECK (bucket_id = 'stickers-photos');
