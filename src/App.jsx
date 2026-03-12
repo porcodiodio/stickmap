@@ -26,11 +26,19 @@ function App() {
         
         // Find the country feature
         const features = geoResponse.data.features;
+        console.log("Geocoding features found:", features);
+        
+        // Try to find country in features or in context of the first feature
         const countryFeature = features.find(f => f.properties.feature_type === 'country');
         
         if (countryFeature) {
            countryCode = countryFeature.properties.context?.country?.country_code_alpha_3?.toUpperCase();
+        } else if (features.length > 0) {
+           // Fallback: check context of the first feature
+           countryCode = features[0].properties.context?.country?.country_code_alpha_3?.toUpperCase();
         }
+        
+        console.log("Detected Country Code (ISO-A3):", countryCode);
       } catch (e) {
         console.error("Geocoding failed, continuing without country code", e);
       }
