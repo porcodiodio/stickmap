@@ -62,15 +62,11 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
     id: 'countries',
     type: 'fill',
     paint: {
-      'fill-color': [
-        'match',
-        ['get', 'ISO_A3'],
-        ...countriesWithStickers.flatMap(code => [code, '#6366f1']), 
-        'rgba(255, 255, 255, 0)' // Transparent par défaut si pas matché
-      ],
-      'fill-opacity': 0.6,
+      'fill-color': '#6366f1',
+      'fill-opacity': 0.4,
       'fill-outline-color': '#4f46e5'
-    }
+    },
+    filter: ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]]
   };
 
   return (
