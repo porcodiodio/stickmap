@@ -4,6 +4,7 @@ import './App.css'
 import GlobeMap from './components/GlobeMap'
 import AddStickerModal from './components/AddStickerModal'
 import AuthModal from './components/AuthModal'
+import ProfileModal from './components/ProfileModal'
 import StickerDetailModal from './components/StickerDetailModal'
 import { supabase } from './lib/supabase'
 
@@ -12,6 +13,7 @@ function App() {
   const [profile, setProfile] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -133,7 +135,7 @@ function App() {
         
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
             className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer overflow-hidden hover:border-indigo-500 transition-all"
           >
             {profile?.avatar_url || user ? (
@@ -201,6 +203,14 @@ function App() {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
+      />
+
+      <ProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)}
+        user={user}
+        profile={profile}
+        onUpdate={() => fetchProfile(user.id)}
       />
 
       <StickerDetailModal 
