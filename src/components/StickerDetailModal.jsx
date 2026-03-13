@@ -36,12 +36,36 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
   };
 
   const fetchComments = async () => {
-    const { data } = await supabase
-      .from('sticker_comments')
-      .select('*, profiles(username, avatar_url)')
-      .eq('sticker_id', sticker.id)
-      .order('created_at', { ascending: true });
-    if (data) setComments(data);
+    try {
+      // 1. Fetch comments
+      const { data: commentsData, error } = await supabase
+        .from('sticker_comments')
+        .select('*')
+        .eq('sticker_id', sticker.id)
+        .order('created_at', { ascending: true });
+
+      if (error) { console.error("Comments fetch error:", error); return; }
+      if (!commentsData || commentsData.length === 0) { setComments([]); return; }
+
+      // 2. Fetch profiles for all unique user_ids
+      const userIds = [...new Set(commentsData.map(c => c.user_id))];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds);
+
+      const profilesMap = {};
+      (profilesData || []).forEach(p => { profilesMap[p.id] = p; });
+
+      // 3. Merge
+      const merged = commentsData.map(c => ({
+        ...c,
+        profiles: profilesMap[c.user_id] || null
+      }));
+      setComments(merged);
+    } catch (err) {
+      console.error("fetchComments error:", err);
+    }
   };
 
   const handlePostComment = async (e) => {
