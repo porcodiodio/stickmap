@@ -65,11 +65,20 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
     id: 'countries',
     type: 'fill',
     paint: {
-      'fill-color': '#6366f1',
+      'fill-color': [
+        'match',
+        ['get', 'ISO3166-1-Alpha-3'],
+        ...countriesWithStickers.flatMap(code => [code, '#6366f1']),
+        'transparent'
+      ],
       'fill-opacity': 0.4,
-      'fill-outline-color': '#4f46e5'
-    },
-    filter: ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]]
+      'fill-outline-color': [
+        'match',
+        ['get', 'ISO3166-1-Alpha-3'],
+        ...countriesWithStickers.flatMap(code => [code, '#4f46e5']),
+        'transparent'
+      ]
+    }
   };
 
   return (

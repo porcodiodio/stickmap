@@ -77,7 +77,7 @@ function App() {
         ]);
 
       if (dbError) throw dbError;
-
+      console.log("Sticker successfully inserted with country code:", countryCode);
       alert("Sticker ajouté avec succès !");
       setRefreshTrigger(prev => prev + 1);
       
