@@ -136,9 +136,11 @@ function App() {
         <div className="flex items-center gap-3">
           <button 
             onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
-            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer overflow-hidden hover:border-indigo-500 transition-all"
+            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer overflow-hidden hover:border-indigo-500 transition-all shadow-lg"
           >
-            {profile?.avatar_url || user ? (
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            ) : user ? (
               <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-bold">
                 {profile?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
               </div>
