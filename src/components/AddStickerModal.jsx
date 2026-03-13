@@ -48,7 +48,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
         {/* Header */}
         <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50/80 backdrop-blur-md sticky top-0 z-10">
           <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Nouveau Sticker (V2.1)
+            Nouveau Sticker
           </h2>
           <button onClick={onClose} className="p-2 bg-gray-200/60 hover:bg-gray-300 rounded-full transition-colors text-gray-600">
             <X size={20} />
@@ -56,18 +56,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 bg-yellow-50">
-          
-          {/* Caption Area - MOVED UP FOR DEBUG */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">✍️ Un petit mot ? (Optionnel)</label>
-            <textarea
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Racontez votre souvenir en quelques mots..."
-              className="w-full p-4 rounded-2xl border-2 border-indigo-200 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none h-24 text-gray-700 font-medium"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
           
           {/* Photo Upload Area */}
           <div className="space-y-2">
