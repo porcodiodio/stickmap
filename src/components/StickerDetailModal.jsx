@@ -9,6 +9,8 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
   const [newComment, setNewComment] = useState('');
   const [postingComment, setPostingComment] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
 
   const isOwner = currentUser && sticker && currentUser.id === sticker.user_id;
 
@@ -66,6 +68,20 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
     } catch (err) {
       console.error("fetchComments error:", err);
     }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Supprimer ce commentaire ?')) return;
+    const { error } = await supabase.from('sticker_comments').delete().eq('id', commentId);
+    if (!error) fetchComments();
+  };
+
+  const handleEditComment = async (commentId) => {
+    if (!editingContent.trim()) return;
+    const { error } = await supabase.from('sticker_comments')
+      .update({ content: editingContent.trim() })
+      .eq('id', commentId);
+    if (!error) { setEditingCommentId(null); setEditingContent(''); fetchComments(); }
   };
 
   const handlePostComment = async (e) => {
@@ -169,23 +185,66 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
               <p className="text-gray-600 text-sm text-center py-4">Soyez le premier à commenter ! 👋</p>
             )}
 
-            {comments.map((comment) => (
-              <div key={comment.id} className="flex gap-3">
-                <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0">
-                  {comment.profiles?.avatar_url ? (
-                    <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-indigo-400 font-bold text-xs">
-                      {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
-                    </span>
-                  )}
+            {comments.map((comment) => {
+              const isCommentOwner = currentUser && currentUser.id === comment.user_id;
+              const isEditing = editingCommentId === comment.id;
+              return (
+                <div key={comment.id} className="flex gap-3">
+                  <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0 mt-1">
+                    {comment.profiles?.avatar_url ? (
+                      <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-indigo-400 font-bold text-xs">
+                        {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="bg-gray-800 rounded-2xl rounded-tl-none px-3 py-2 flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-indigo-400 text-xs font-bold">{comment.profiles?.username || 'Anonyme'}</p>
+                      {isCommentOwner && !isEditing && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => { setEditingCommentId(comment.id); setEditingContent(comment.content); }}
+                            className="text-gray-500 hover:text-indigo-400 transition-colors"
+                            title="Modifier"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="text-gray-500 hover:text-red-400 transition-colors"
+                            title="Supprimer"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {isEditing ? (
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          autoFocus
+                          type="text"
+                          value={editingContent}
+                          onChange={(e) => setEditingContent(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') handleEditComment(comment.id); if (e.key === 'Escape') setEditingCommentId(null); }}
+                          className="flex-1 bg-gray-700 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
+                        <button onClick={() => handleEditComment(comment.id)} className="text-green-400 hover:text-green-300 text-xs font-bold">OK</button>
+                        <button onClick={() => setEditingCommentId(null)} className="text-gray-500 hover:text-white text-xs">Annuler</button>
+                      </div>
+                    ) : (
+                      <p className="text-gray-200 text-sm">{comment.content}</p>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-gray-800 rounded-2xl rounded-tl-none px-3 py-2 flex-1">
-                  <p className="text-indigo-400 text-xs font-bold mb-1">{comment.profiles?.username || 'Anonyme'}</p>
-                  <p className="text-gray-200 text-sm">{comment.content}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Comment Input */}
             {currentUser ? (
