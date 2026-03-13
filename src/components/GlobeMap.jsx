@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
-import Map, { NavigationControl, Source, Layer, Marker } from 'react-map-gl';
+import Map, { Source, Layer, Marker } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import countriesData from '../data/countries.geojson?url';
 import { supabase } from '../lib/supabase';
@@ -143,7 +143,6 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
           </Marker>
         ))}
         
-        <NavigationControl position="top-right" />
       </Map>
       
       {/* Overlay gradient for aesthetics */}
