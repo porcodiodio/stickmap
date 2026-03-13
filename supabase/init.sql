@@ -1,7 +1,46 @@
 -- Script de création des tables pour StickMap (à lancer dans le SQL Editor de Supabase)
 
--- 1. Table Utilisateurs (Extension de auth.users si besoin, mais on peut rester simple pour le moment)
--- On utilise directement auth.users pour l'authentification (Google/Apple) gérée par Supabase.
+-- 1. Table Profils (Infos publiques des utilisateurs)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    username TEXT UNIQUE,
+    full_name TEXT,
+    avatar_url TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS pour les profils
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Profils publics sont visibles par tous" 
+ON public.profiles FOR SELECT 
+TO public 
+USING (true);
+
+CREATE POLICY "Les utilisateurs peuvent modifier leur propre profil" 
+ON public.profiles FOR UPDATE 
+TO authenticated 
+USING (auth.uid() = id);
+
+-- Fonction pour créer un profil automatiquement à l'inscription
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.profiles (id, username, full_name, avatar_url)
+  VALUES (
+    new.id, 
+    COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)), 
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger pour appeler la fonction à chaque insert dans auth.users
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- 2. Table Stickers
 CREATE TABLE IF NOT EXISTS public.stickers (
@@ -32,6 +71,7 @@ TO public
 USING (true);
 
 -- Politique : Tout le monde peut ajouter un sticker (Simplification pour MVP sans Auth complet)
+-- NOTE : Dans une version finale, on changerait TO public en TO authenticated
 CREATE POLICY "Tout le monde peut ajouter des stickers" 
 ON public.stickers FOR INSERT 
 TO public 
