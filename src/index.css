@@ -5,6 +5,14 @@
 @layer base {
   body {
     @apply antialiased text-gray-900 bg-gray-50;
+    overflow-x: hidden;
+  }
+  html {
+    overflow-x: hidden;
+  }
+  /* Prevent iOS from zooming in on inputs (which causes layout shifts) */
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
 

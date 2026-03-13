@@ -107,7 +107,7 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
   if (!isOpen || !sticker) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-x-hidden">
       <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 flex-shrink-0">
