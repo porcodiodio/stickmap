@@ -87,6 +87,17 @@ export default function AddStickerModal({ onClose, onAdd }) {
             </div>
           </div>
 
+          {/* Caption Area */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">Un petit mot ? (Optionnel)</label>
+            <textarea
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Racontez votre souvenir en quelques mots..."
+              className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none h-24 text-gray-700 font-medium"
+            />
+          </div>
+
 
           {/* Location Area */}
           <div className="space-y-2">
