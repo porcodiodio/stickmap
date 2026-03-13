@@ -220,6 +220,11 @@ function App() {
         isOpen={!!selectedSticker} 
         onClose={() => setSelectedSticker(null)}
         sticker={selectedSticker}
+        currentUser={user}
+        onStickerUpdated={() => {
+          setRefreshTrigger(prev => prev + 1);
+          setSelectedSticker(null);
+        }}
       />
     </div>
   )
