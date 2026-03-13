@@ -1,16 +1,44 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'
 import GlobeMap from './components/GlobeMap'
 import AddStickerModal from './components/AddStickerModal'
+import AuthModal from './components/AuthModal'
+import StickerDetailModal from './components/StickerDetailModal'
 import { supabase } from './lib/supabase'
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [selectedSticker, setSelectedSticker] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+      else setProfile(null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (data) setProfile(data);
+  };
 
   const handleAddSticker = async (data) => {
     try {
@@ -72,7 +100,8 @@ function App() {
             latitude: data.location.lat, 
             longitude: data.location.lng,
             photo_url: photoUrl,
-            country_code: countryCode
+            country_code: countryCode,
+            user_id: user?.id // Nullable if not logged in, but better if logged in
           }
         ]);
 
@@ -101,19 +130,32 @@ function App() {
         <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent drop-shadow-sm">
           StickMap
         </h1>
-        <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer hover:bg-gray-700 transition"
-          onClick={() => {
-             if (mapRef.current) mapRef.current.flyToLastSticker();
-          }}
-          title="Centrer sur le dernier sticker"
-        >
-          <svg className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer overflow-hidden hover:border-indigo-500 transition-all"
+          >
+            {profile?.avatar_url || user ? (
+              <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-bold">
+                {profile?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
+              </div>
+            ) : (
+              <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            )}
+          </button>
         </div>
       </header>
 
       {/* Main Map Content - Full space */}
       <main className="flex-1 w-full h-full relative z-0">
-        <GlobeMap ref={mapRef} refreshTrigger={refreshTrigger} />
+        <GlobeMap 
+          ref={mapRef} 
+          refreshTrigger={refreshTrigger} 
+          onSelectSticker={(sticker) => setSelectedSticker(sticker)}
+        />
       </main>
 
       {/* Mobile Navigation Bar */}
@@ -148,13 +190,24 @@ function App() {
         </button>
       </nav>
 
-      {/* Add Modal */}
+      {/* Modals */}
       {isAddModalOpen && (
         <AddStickerModal 
           onClose={() => setIsAddModalOpen(false)} 
           onAdd={handleAddSticker}
         />
       )}
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+      />
+
+      <StickerDetailModal 
+        isOpen={!!selectedSticker} 
+        onClose={() => setSelectedSticker(null)}
+        sticker={selectedSticker}
+      />
     </div>
   )
 }

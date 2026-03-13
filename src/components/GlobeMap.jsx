@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
-const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
+const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
   const mapRef = useRef(null);
   const [stickers, setStickers] = useState([]);
   
@@ -129,6 +129,10 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
             longitude={sticker.longitude} 
             latitude={sticker.latitude}
             anchor="bottom"
+            onClick={(e) => {
+              e.originalEvent.stopPropagation();
+              onSelectSticker(sticker);
+            }}
           >
             <div className="group cursor-pointer transform transition-transform hover:scale-110 relative z-10">
               <div className="w-10 h-10 bg-white rounded-full p-1 shadow-lg border-2 border-indigo-500 overflow-hidden shrink-0">
