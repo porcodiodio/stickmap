@@ -23,13 +23,17 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ username, updated_at: new Date() })
-        .eq('id', user.id);
+        .upsert({ 
+          id: user.id,
+          username, 
+          updated_at: new Date().toISOString() 
+        });
 
       if (error) throw error;
       onUpdate();
       alert("Profil mis à jour !");
     } catch (err) {
+      console.error("Pseudo update error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -47,27 +51,44 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
+      console.log("Attempting upload to storage:", filePath);
 
-      let { error: uploadError } = await supabase.storage
+      let { data: uploadData, error: uploadError } = await supabase.storage
         .from('stickers-photos')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        throw uploadError;
+      }
+      
+      console.log("Upload successful:", uploadData);
 
       const { data: publicURLData } = supabase.storage
         .from('stickers-photos')
         .getPublicUrl(filePath);
 
       const avatarUrl = publicURLData.publicUrl;
+      console.log("New avatar URL generated:", avatarUrl);
 
+      // Utiliser upsert au lieu de update pour s'assurer que la ligne existe
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: avatarUrl, updated_at: new Date() })
-        .eq('id', user.id);
+        .upsert({ 
+          id: user.id,
+          avatar_url: avatarUrl, 
+          updated_at: new Date().toISOString() 
+        });
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("Profile upsert error:", updateError);
+        throw updateError;
+      }
+      
+      console.log("Profile upserted successfully in DB");
       onUpdate();
     } catch (err) {
+      console.error("Error during avatar upload:", err);
       setError(err.message);
     } finally {
       setUploading(false);
