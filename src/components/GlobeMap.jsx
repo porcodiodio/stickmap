@@ -52,13 +52,30 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
     }
   };
 
+  // Mapping des codes ISO vers les noms exacts dans countries.geojson pour les pays ayant "-99"
+  const ISO_TO_NAME_MAP = {
+    'FRA': 'France',
+    'NOR': 'Norway',
+    'SYR': 'Syria',
+    'PRY': 'Paraguay',
+    'BHR': 'Bahrain',
+    'LVA': 'Latvia',
+    'UGA': 'Uganda',
+    'AZE': 'Azerbaijan'
+  };
+
   // Extract unique countries
   const countriesWithStickers = useMemo(() => {
     const uniqueCodes = new Set(stickers.map(s => s.country_code).filter(Boolean));
     const codesArray = Array.from(uniqueCodes);
-    console.log("Countries to highlight (ISO A3):", codesArray);
+    console.log("Stickers country codes (ISO A3):", codesArray);
     return codesArray;
   }, [stickers]);
+
+  // Noms correspondants pour le fallback
+  const namesWithStickers = useMemo(() => {
+    return countriesWithStickers.map(code => ISO_TO_NAME_MAP[code]).filter(Boolean);
+  }, [countriesWithStickers]);
 
   // Style de la couche GeoJSON
   const countryLayerStyle = {
@@ -66,17 +83,23 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
     type: 'fill',
     paint: {
       'fill-color': [
-        'match',
-        ['get', 'ISO3166-1-Alpha-3'],
-        ...countriesWithStickers.flatMap(code => [code, '#6366f1']),
-        'transparent'
+        'case',
+        ['any', 
+          ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
+          ['in', ['get', 'name'], ['literal', namesWithStickers]]
+        ],
+        '#6366f1',
+        'rgba(0,0,0,0)'
       ],
       'fill-opacity': 0.4,
       'fill-outline-color': [
-        'match',
-        ['get', 'ISO3166-1-Alpha-3'],
-        ...countriesWithStickers.flatMap(code => [code, '#4f46e5']),
-        'transparent'
+        'case',
+        ['any', 
+          ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
+          ['in', ['get', 'name'], ['literal', namesWithStickers]]
+        ],
+        '#4f46e5',
+        'rgba(0,0,0,0)'
       ]
     }
   };
