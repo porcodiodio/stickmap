@@ -45,6 +45,7 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
         .order('created_at', { ascending: true });
       
       if (error) throw error;
+      console.log("Stickers fetched from DB:", data);
       setStickers(data || []);
     } catch (error) {
       console.error("Erreur chargement des stickers:", error);
@@ -54,7 +55,9 @@ const GlobeMap = forwardRef(({ refreshTrigger }, ref) => {
   // Extract unique countries
   const countriesWithStickers = useMemo(() => {
     const uniqueCodes = new Set(stickers.map(s => s.country_code).filter(Boolean));
-    return Array.from(uniqueCodes);
+    const codesArray = Array.from(uniqueCodes);
+    console.log("Countries to highlight (ISO A3):", codesArray);
+    return codesArray;
   }, [stickers]);
 
   // Style de la couche GeoJSON
