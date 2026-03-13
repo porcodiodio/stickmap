@@ -17,3 +17,10 @@ html, body, #root {
   width: 100% !important;
   height: 100% !important;
 }
+
+/* Hide Mapbox default navigation controls */
+.mapboxgl-ctrl-top-right,
+.mapboxgl-ctrl-bottom-right,
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
+}
