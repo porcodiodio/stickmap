@@ -3,6 +3,7 @@ import { Camera, MapPin, X, Upload } from 'lucide-react';
 
 export default function AddStickerModal({ onClose, onAdd }) {
   const [photo, setPhoto] = useState(null);
+  const [caption, setCaption] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [location, setLocation] = useState(null);
 
@@ -36,7 +37,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
       return;
     }
     // TODO: Send to Supabase
-    onAdd({ photo, location });
+    onAdd({ photo, location, caption });
     onClose();
   };
 

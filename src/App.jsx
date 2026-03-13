@@ -103,7 +103,8 @@ function App() {
             longitude: data.location.lng,
             photo_url: photoUrl,
             country_code: countryCode,
-            user_id: user?.id // Nullable if not logged in, but better if logged in
+            user_id: user?.id,
+            caption: data.caption
           }
         ]);
 

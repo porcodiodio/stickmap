@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.stickers (
     longitude DOUBLE PRECISION NOT NULL,
     country_code VARCHAR(3), -- Code pays ISO 3166-1 alpha-3 (ex: 'FRA', 'USA')
     photo_url TEXT,
+    caption TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
