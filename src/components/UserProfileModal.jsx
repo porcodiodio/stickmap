@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { computeAchievements } from '../lib/achievements';
 
 // Convert ISO 3166-1 alpha-3 -> alpha-2 for flag emojis
 const ISO3_TO_ISO2 = {
@@ -33,6 +34,7 @@ export default function UserProfileModal({ userId, onClose }) {
   const [profile, setProfile] = useState(null);
   const [countries, setCountries] = useState([]);
   const [stickerCount, setStickerCount] = useState(0);
+  const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,20 +44,37 @@ export default function UserProfileModal({ userId, onClose }) {
   const fetchUserData = async () => {
     setLoading(true);
     try {
-      const [{ data: profileData }, { data: stickersData }] = await Promise.all([
+      const [
+        { data: profileData },
+        { data: stickersData },
+        { count: commentCount }
+      ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('stickers').select('country_code').eq('user_id', userId).not('country_code', 'is', null),
+        supabase.from('stickers').select('country_code').eq('user_id', userId),
+        supabase.from('sticker_comments').select('id', { count: 'exact', head: true }).eq('user_id', userId),
       ]);
 
       setProfile(profileData);
-      setStickerCount(stickersData?.length || 0);
 
-      const uniqueCodes = [...new Set((stickersData || []).map(s => s.country_code))].filter(Boolean);
+      const count = stickersData?.length || 0;
+      setStickerCount(count);
+
+      const uniqueCodes = [...new Set((stickersData || []).map(s => s.country_code).filter(Boolean))];
       setCountries(uniqueCodes);
+
+      // Compute achievements
+      const computed = computeAchievements({
+        stickerCount: count,
+        countryCodes: uniqueCodes,
+        commentCount: commentCount || 0,
+      });
+      setAchievements(computed);
     } finally {
       setLoading(false);
     }
   };
+
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
     <div
@@ -63,11 +82,11 @@ export default function UserProfileModal({ userId, onClose }) {
       onClick={onClose}
     >
       <div
-        className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300"
+        className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close handle */}
-        <div className="flex justify-center pt-3 pb-1">
+        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
           <div className="w-10 h-1 bg-gray-700 rounded-full"></div>
         </div>
 
@@ -76,7 +95,7 @@ export default function UserProfileModal({ userId, onClose }) {
             <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="p-6 space-y-5">
+          <div className="overflow-y-auto p-6 space-y-5">
             {/* Profile header */}
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="w-24 h-24 bg-indigo-500/20 rounded-full flex items-center justify-center border-4 border-indigo-500/40 overflow-hidden shadow-lg">
@@ -90,9 +109,14 @@ export default function UserProfileModal({ userId, onClose }) {
               </div>
               <div>
                 <h2 className="text-white font-bold text-2xl">{profile?.username || 'Explorateur'}</h2>
-                <p className="text-indigo-400 text-sm font-medium mt-0.5">
-                  {stickerCount} sticker{stickerCount > 1 ? 's' : ''} posté{stickerCount > 1 ? 's' : ''} dans le monde
-                </p>
+                <div className="flex items-center justify-center gap-3 mt-1">
+                  <span className="text-indigo-400 text-sm font-medium">
+                    📌 {stickerCount} sticker{stickerCount > 1 ? 's' : ''}
+                  </span>
+                  <span className="text-yellow-400 text-sm font-medium">
+                    🏆 {unlockedCount}/{achievements.length} succès
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -104,7 +128,7 @@ export default function UserProfileModal({ userId, onClose }) {
               {countries.length === 0 ? (
                 <p className="text-gray-600 text-sm text-center py-2">Aucun pays encore 😊</p>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {countries.map((code) => {
                     const flag = getFlag(code);
                     return flag ? (
@@ -113,6 +137,34 @@ export default function UserProfileModal({ userId, onClose }) {
                   })}
                 </div>
               )}
+            </div>
+
+            {/* Achievements */}
+            <div className="bg-gray-800/60 rounded-2xl p-4">
+              <p className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-3">
+                🏆 Succès
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                {achievements.map((a) => (
+                  <div
+                    key={a.id}
+                    className={`flex flex-col items-center gap-1 p-2 rounded-xl text-center transition-all ${
+                      a.unlocked
+                        ? 'bg-indigo-500/15 border border-indigo-500/30'
+                        : 'bg-gray-700/30 opacity-40'
+                    }`}
+                    title={a.description}
+                  >
+                    <span className={`text-2xl ${a.unlocked ? '' : 'grayscale'}`}>{a.icon}</span>
+                    <p className={`text-xs font-bold leading-tight ${a.unlocked ? 'text-white' : 'text-gray-500'}`}>
+                      {a.name}
+                    </p>
+                    {a.unlocked && (
+                      <span className="text-[9px] text-indigo-400 font-semibold uppercase tracking-wider">Débloqué</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <button
