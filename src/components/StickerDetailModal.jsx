@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import EditStickerModal from './EditStickerModal';
+import UserProfileModal from './UserProfileModal';
 
 export default function StickerDetailModal({ isOpen, onClose, sticker, currentUser, onStickerUpdated }) {
   const [profile, setProfile] = useState(null);
@@ -11,6 +12,7 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingContent, setEditingContent] = useState('');
+  const [viewingUserId, setViewingUserId] = useState(null);
 
   const isOwner = currentUser && sticker && currentUser.id === sticker.user_id;
 
@@ -116,7 +118,11 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
               <div className="w-10 h-10 bg-gray-800 rounded-full animate-pulse"></div>
             ) : (
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden">
+                <button
+                  onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
+                  className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden hover:ring-2 hover:ring-indigo-400 transition-all cursor-pointer flex-shrink-0"
+                  title="Voir le profil"
+                >
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -124,9 +130,14 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
                       {profile?.username?.charAt(0).toUpperCase() || '?'}
                     </span>
                   )}
-                </div>
+                </button>
                 <div>
-                  <p className="text-white font-bold leading-none">{profile?.username || 'Explorateur'}</p>
+                  <button
+                    onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
+                    className="text-white font-bold leading-none hover:text-indigo-300 transition-colors"
+                  >
+                    {profile?.username || 'Explorateur'}
+                  </button>
                   <p className="text-gray-500 text-xs mt-1">
                     {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
@@ -275,7 +286,6 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
         </div>
       </div>
 
-      {/* Edit Modal */}
       {isEditOpen && (
         <EditStickerModal
           sticker={sticker}
@@ -284,6 +294,13 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
             setIsEditOpen(false);
             onStickerUpdated?.();
           }}
+        />
+      )}
+
+      {viewingUserId && (
+        <UserProfileModal
+          userId={viewingUserId}
+          onClose={() => setViewingUserId(null)}
         />
       )}
     </div>
