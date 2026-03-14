@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import UserProfileModal from './UserProfileModal';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 export default function LeaderboardModal({ isOpen, onClose }) {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewingUserId, setViewingUserId] = useState(null);
 
   useEffect(() => {
     if (isOpen) fetchLeaderboard();
@@ -76,13 +78,14 @@ export default function LeaderboardModal({ isOpen, onClose }) {
           </div>
         ) : (
           leaderboard.map((member, index) => (
-            <div
+            <button
               key={member.id}
-              className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
-                index === 0 ? 'bg-yellow-500/10 border-yellow-500/30' :
-                index === 1 ? 'bg-gray-400/10 border-gray-400/20' :
-                index === 2 ? 'bg-amber-600/10 border-amber-600/20' :
-                'bg-gray-800/50 border-gray-800'
+              onClick={() => setViewingUserId(member.id)}
+              className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group ${
+                index === 0 ? 'bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20' :
+                index === 1 ? 'bg-gray-400/10 border-gray-400/20 hover:bg-gray-400/20' :
+                index === 2 ? 'bg-amber-600/10 border-amber-600/20 hover:bg-amber-600/20' :
+                'bg-gray-800/50 border-gray-800 hover:bg-gray-800'
               }`}
             >
               {/* Rank */}
@@ -90,12 +93,12 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                 {index < 3 ? (
                   <span className="text-2xl">{MEDALS[index]}</span>
                 ) : (
-                  <span className="text-gray-500 font-bold text-lg">#{index + 1}</span>
+                  <span className="text-gray-500 font-bold text-lg group-hover:text-white transition-colors">#{index + 1}</span>
                 )}
               </div>
 
               {/* Avatar */}
-              <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0">
+              <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0 group-hover:ring-2 group-hover:ring-indigo-400 transition-all">
                 {member.avatar_url ? (
                   <img src={member.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -107,7 +110,7 @@ export default function LeaderboardModal({ isOpen, onClose }) {
 
               {/* Name & count */}
               <div className="flex-1 min-w-0">
-                <p className={`font-bold truncate ${index === 0 ? 'text-yellow-300' : 'text-white'}`}>
+                <p className={`font-bold truncate group-hover:translate-x-1 transition-transform ${index === 0 ? 'text-yellow-300' : 'text-white'}`}>
                   {member.username || 'Explorateur'}
                 </p>
                 <p className="text-gray-500 text-sm">{member.count} sticker{member.count > 1 ? 's' : ''}</p>
@@ -122,10 +125,17 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                   />
                 </div>
               </div>
-            </div>
+            </button>
           ))
         )}
       </div>
+
+      {viewingUserId && (
+        <UserProfileModal 
+          userId={viewingUserId} 
+          onClose={() => setViewingUserId(null)} 
+        />
+      )}
     </div>
   );
 }

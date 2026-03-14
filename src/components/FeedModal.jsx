@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import UserProfileModal from './UserProfileModal';
 
 export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
   const [stickers, setStickers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewingUserId, setViewingUserId] = useState(null);
 
   useEffect(() => {
     if (isOpen) fetchFeed();
@@ -83,7 +85,14 @@ export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
                 className="w-full flex gap-3 p-4 hover:bg-gray-800/50 transition-colors text-left"
               >
                 {/* Author avatar */}
-                <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0">
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (sticker.user_id) setViewingUserId(sticker.user_id);
+                  }}
+                  className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-indigo-400 transition-all"
+                  title="Voir le profil"
+                >
                   {sticker.profile?.avatar_url ? (
                     <img src={sticker.profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -95,7 +104,13 @@ export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="text-white font-semibold text-sm truncate">
+                    <p 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (sticker.user_id) setViewingUserId(sticker.user_id);
+                      }}
+                      className="text-white font-semibold text-sm truncate hover:text-indigo-300 transition-colors cursor-pointer"
+                    >
                       {sticker.profile?.username || 'Explorateur'}
                     </p>
                     <p className="text-gray-500 text-xs flex-shrink-0">{timeAgo(sticker.created_at)}</p>
@@ -115,6 +130,13 @@ export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
           </div>
         )}
       </div>
+
+      {viewingUserId && (
+        <UserProfileModal 
+          userId={viewingUserId} 
+          onClose={() => setViewingUserId(null)} 
+        />
+      )}
     </div>
   );
 }
