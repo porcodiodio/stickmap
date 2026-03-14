@@ -6,6 +6,8 @@ import AddStickerModal from './components/AddStickerModal'
 import AuthModal from './components/AuthModal'
 import ProfileModal from './components/ProfileModal'
 import StickerDetailModal from './components/StickerDetailModal'
+import FeedModal from './components/FeedModal'
+import LeaderboardModal from './components/LeaderboardModal'
 import { supabase } from './lib/supabase'
 
 function App() {
@@ -14,6 +16,8 @@ function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isFeedOpen, setIsFeedOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -128,30 +132,11 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col w-full max-w-md mx-auto bg-gray-900 shadow-2xl relative overflow-hidden">
-      {/* Header Mobile */}
-      <header className="px-4 py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 absolute top-0 w-full z-20 flex justify-between items-center">
+      {/* Compact Header - Logo only */}
+      <header className="px-4 py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 absolute top-0 w-full z-20 flex justify-center items-center">
         <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent drop-shadow-sm">
           StickMap
         </h1>
-        
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
-            className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 cursor-pointer overflow-hidden hover:border-indigo-500 transition-all shadow-lg"
-          >
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : user ? (
-              <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white font-bold">
-                {profile?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
-              </div>
-            ) : (
-              <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            )}
-          </button>
-        </div>
       </header>
 
       {/* Main Map Content - Full space */}
@@ -163,22 +148,30 @@ function App() {
         />
       </main>
 
-      {/* Mobile Navigation Bar */}
-      <nav className="absolute bottom-0 w-full bg-gray-900/90 backdrop-blur-lg border-t border-gray-800 px-6 py-4 flex justify-between items-center z-20 pb-safe">
-        <button 
-          onClick={() => {
-            if (mapRef.current) mapRef.current.flyToLastSticker();
-          }}
-          className="flex flex-col items-center text-indigo-400 transition-colors cursor-pointer"
+      {/* Mobile Navigation Bar - 5 icons */}
+      <nav className="absolute bottom-0 w-full bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 px-2 py-2 flex justify-around items-center z-20 pb-safe">
+        {/* 1. Feed */}
+        <button
+          onClick={() => setIsFeedOpen(true)}
+          className="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-400 transition-colors p-2"
         >
-          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <span className="text-[10px] uppercase tracking-wider font-bold">Explorer</span>
+          <span className="text-2xl">🔥</span>
+          <span className="text-[9px] uppercase tracking-wider font-bold">Actus</span>
         </button>
-        
-        {/* Floating Add Button */}
-        <button 
+
+        {/* 2. Leaderboard */}
+        <button
+          onClick={() => setIsLeaderboardOpen(true)}
+          className="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-400 transition-colors p-2"
+        >
+          <span className="text-2xl">🏆</span>
+          <span className="text-[9px] uppercase tracking-wider font-bold">Top</span>
+        </button>
+
+        {/* 3. Add Sticker (center CTA) */}
+        <button
           onClick={() => setIsAddModalOpen(true)}
-          className="w-14 h-14 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] transform -translate-y-6 hover:scale-105 active:scale-95 transition-all outline-none ring-4 ring-gray-900 cursor-pointer relative"
+          className="w-14 h-14 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] transform -translate-y-4 hover:scale-105 active:scale-95 transition-all outline-none ring-4 ring-gray-900 cursor-pointer relative"
         >
           <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
           {isUploading && (
@@ -188,10 +181,32 @@ function App() {
             </span>
           )}
         </button>
-        
-        <button className="flex flex-col items-center text-gray-500 hover:text-indigo-400 transition-colors cursor-not-allowed opacity-50">
-          <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-          <span className="text-[10px] uppercase tracking-wider font-bold">Menu</span>
+
+        {/* 4. Placeholder - future feature */}
+        <button className="flex flex-col items-center gap-1 text-gray-600 p-2 cursor-not-allowed opacity-50">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          <span className="text-[9px] uppercase tracking-wider font-bold">Bientôt</span>
+        </button>
+
+        {/* 5. Profile */}
+        <button
+          onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
+          className="flex flex-col items-center gap-1 text-gray-400 hover:text-indigo-400 transition-colors p-2"
+        >
+          <div className="w-7 h-7 rounded-full bg-gray-700 border border-gray-600 overflow-hidden flex items-center justify-center">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : user ? (
+              <span className="text-white font-bold text-xs">{profile?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}</span>
+            ) : (
+              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            )}
+          </div>
+          <span className="text-[9px] uppercase tracking-wider font-bold">Profil</span>
         </button>
       </nav>
 
@@ -225,6 +240,17 @@ function App() {
           setRefreshTrigger(prev => prev + 1);
           setSelectedSticker(null);
         }}
+      />
+
+      <FeedModal
+        isOpen={isFeedOpen}
+        onClose={() => setIsFeedOpen(false)}
+        onSelectSticker={(sticker) => setSelectedSticker(sticker)}
+      />
+
+      <LeaderboardModal
+        isOpen={isLeaderboardOpen}
+        onClose={() => setIsLeaderboardOpen(false)}
       />
     </div>
   )
