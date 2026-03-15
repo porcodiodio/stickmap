@@ -78,103 +78,96 @@ export default function UserProfileModal({ userId, onClose }) {
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[85vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close handle */}
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 bg-gray-700 rounded-full"></div>
-        </div>
+  return (
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
+        
+        {/* Close Button - Floating */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
         {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="flex items-center justify-center h-64">
+            <div className="w-8 h-8 border-2 border-white/10 border-t-white rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="overflow-y-auto p-6 space-y-5">
-            {/* Profile header */}
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="w-24 h-24 bg-indigo-500/20 rounded-full flex items-center justify-center border-4 border-indigo-500/40 overflow-hidden shadow-lg">
+          <>
+            {/* Header - Profile Info */}
+            <div className="px-8 pt-12 pb-6 flex flex-col items-center text-center">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/5 shadow-2xl mb-4 relative">
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-4xl text-indigo-300 font-bold">
+                  <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/20 text-3xl font-light">
                     {profile?.username?.charAt(0).toUpperCase() || '?'}
-                  </span>
+                  </div>
                 )}
               </div>
-              <div>
-                <h2 className="text-white font-bold text-2xl">{profile?.username || 'Explorateur'}</h2>
-                <div className="flex items-center justify-center gap-3 mt-1">
-                  <span className="text-indigo-400 text-sm font-medium">
-                    📌 {stickerCount} sticker{stickerCount > 1 ? 's' : ''}
-                  </span>
-                  <span className="text-yellow-400 text-sm font-medium">
-                    🏆 {unlockedCount}/{achievements.length} succès
-                  </span>
+              <h2 className="text-3xl font-light tracking-tight text-white mb-2">
+                <span className="font-bold">{profile?.username || 'Explorateur'}</span>
+              </h2>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                  <MapPin size={12} className="text-[#ccff00]" />
+                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stickerCount} sticker{stickerCount > 1 ? 's' : ''}</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                  <Trophy size={12} className="text-yellow-400" />
+                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{unlockedCount}/{achievements.length} succès</span>
                 </div>
               </div>
             </div>
 
-            {/* Countries visited */}
-            <div className="bg-gray-800/60 rounded-2xl p-4">
-              <p className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-3">
-                🌍 Pays visités ({countries.length})
-              </p>
-              {countries.length === 0 ? (
-                <p className="text-gray-600 text-sm text-center py-2">Aucun pays encore 😊</p>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {countries.map((code) => {
-                    const flag = getFlag(code);
-                    return flag ? (
-                      <span key={code} className="text-3xl" title={code}>{flag}</span>
-                    ) : null;
-                  })}
+            {/* Profile Content */}
+            <div className="flex-1 overflow-y-auto px-6 pb-10 space-y-8">
+              
+              {/* Countries Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Pays explorés ({countries.length})</h3>
                 </div>
-              )}
-            </div>
+                <div className="glass-panel rounded-[24px] p-4 border-white/5 bg-white/[0.02] flex flex-wrap gap-2">
+                  {countries.length === 0 ? (
+                    <p className="text-white/20 text-xs italic font-light">Pas encore d'exploration...</p>
+                  ) : (
+                    countries.map(code => (
+                      <div key={code} className="text-2xl hover:scale-125 transition-transform" title={code}>
+                        {getFlag(code)}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
 
-            {/* Achievements */}
-            <div className="bg-gray-800/60 rounded-2xl p-4">
-              <p className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-3">
-                🏆 Succès
-              </p>
-              <div className="grid grid-cols-3 gap-3">
-                {achievements.map((a) => (
-                  <div
-                    key={a.id}
-                    className={`flex flex-col items-center gap-1 p-2 rounded-xl text-center transition-all ${
-                      a.unlocked
-                        ? 'bg-indigo-500/15 border border-indigo-500/30'
-                        : 'bg-gray-700/30 opacity-40'
-                    }`}
-                    title={a.description}
-                  >
-                    <span className={`text-2xl ${a.unlocked ? '' : 'grayscale'}`}>{a.icon}</span>
-                    <p className={`text-xs font-bold leading-tight ${a.unlocked ? 'text-white' : 'text-gray-500'}`}>
-                      {a.name}
-                    </p>
-                    {a.unlocked && (
-                      <span className="text-[9px] text-indigo-400 font-semibold uppercase tracking-wider">Débloqué</span>
-                    )}
-                  </div>
-                ))}
+              {/* Achievements Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                  <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Succès débloqués</h3>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {achievements.map((ach) => (
+                    <div 
+                      key={ach.id}
+                      className={`aspect-square rounded-[24px] p-3 flex flex-col items-center justify-center text-center gap-2 border transition-all ${
+                        ach.unlocked 
+                          ? 'bg-white/5 border-white/10 shadow-[0_10px_20px_rgba(255,255,255,0.03)]' 
+                          : 'bg-black/20 border-white/5 opacity-30 grayscale'
+                      }`}
+                    >
+                      <span className={`text-2xl ${ach.unlocked ? 'animate-bounce-subtle' : ''}`}>{ach.icon}</span>
+                      <span className={`text-[9px] font-bold uppercase tracking-tighter leading-tight ${ach.unlocked ? 'text-white' : 'text-white/40'}`}>
+                        {ach.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-
-            <button
-              onClick={onClose}
-              className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold py-3 rounded-2xl transition-all text-sm"
-            >
-              Fermer
-            </button>
-          </div>
+          </>
         )}
       </div>
     </div>
