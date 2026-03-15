@@ -88,7 +88,7 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
           ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
           ['in', ['get', 'name'], ['literal', namesWithStickers]]
         ],
-        'rgba(255, 255, 255, 0.05)', // Subtle glass fill for active countries
+        'rgba(216, 180, 254, 0.1)', // Subtle lavender glass fill
         'rgba(0,0,0,0)'
       ],
       'fill-outline-color': [
@@ -97,7 +97,7 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
           ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
           ['in', ['get', 'name'], ['literal', namesWithStickers]]
         ],
-        'rgba(255, 255, 255, 0.4)', // Sharp thin white border
+        '#ff71ce', // Neon Pink/Violet outline
         'rgba(0,0,0,0)'
       ]
     }
@@ -114,12 +114,12 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
         mapboxAccessToken={MAPBOX_TOKEN}
         projection="globe"
         fog={{
-          'range': [0.5, 10],
-          'color': '#000000',
-          'horizon-blend': 0.1,
-          'high-color': '#111111',
+          'range': [0.8, 8],
+          'color': '#1a1033', // Deep lavender/violet
+          'horizon-blend': 0.3,
+          'high-color': '#000000',
           'space-color': '#000000',
-          'star-intensity': 0.2
+          'star-intensity': 0.4
         }}
       >
         {/* Layer pour colorer les pays */}
@@ -142,11 +142,11 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
             }}
           >
             <div className="group cursor-pointer transform transition-all hover:scale-110 relative z-10">
-              <div className="w-12 h-12 glass-panel rounded-full p-1 shadow-2xl overflow-hidden shrink-0 border-white/30">
+              <div className="w-12 h-12 glass-panel rounded-full p-1 shadow-[0_0_20px_rgba(255,113,206,0.3)] overflow-hidden shrink-0 border-[#ff71ce]/50">
                 <img src={sticker.photo_url} alt="Sticker" className="w-full h-full object-cover rounded-full" />
               </div>
-              {/* Subtle indicator glow */}
-              <div className="absolute -inset-1 rounded-full bg-white/20 blur-md -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              {/* Vibrant pink glow */}
+              <div className="absolute -inset-1 rounded-full bg-[#ff71ce]/20 blur-md -z-10 opacity-60 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </Marker>
         ))}
