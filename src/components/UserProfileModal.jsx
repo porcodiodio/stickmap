@@ -78,7 +78,6 @@ export default function UserProfileModal({ userId, onClose }) {
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   return (
-  return (
     <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
       <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
