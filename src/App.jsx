@@ -135,9 +135,9 @@ function App() {
       {/* Ultra-Premium Header */}
       <header className="px-6 py-5 absolute top-0 w-full z-20 flex justify-center items-center bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex flex-col items-center">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-0.5">Explore the World</span>
-          <h1 className="text-2xl font-light tracking-tight text-white">
-            Milano <span className="font-bold">Stickerini</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-0.5">Stick the World</span>
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            Milano Stickerini
           </h1>
         </div>
       </header>
