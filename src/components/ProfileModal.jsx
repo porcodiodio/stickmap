@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { Camera, LogOut, X } from 'lucide-react';
 
 export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate }) {
   const [username, setUsername] = useState('');
@@ -101,70 +102,80 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-white">Mon Profil</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
+        
+        {/* Close Button - Floating */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-          <div className="flex flex-col items-center mb-8">
-            <div className="relative group">
-              <div className="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-gray-800 overflow-hidden shadow-xl">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  profile?.username?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()
-                )}
+        {/* Header */}
+        <div className="px-8 pt-10 pb-6 flex flex-col items-center text-center">
+          <div className="relative group mb-4">
+            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center text-white text-3xl font-light border-4 border-white/5 overflow-hidden shadow-2xl relative">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="opacity-40">
+                  {profile?.username?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
+                </span>
+              )}
+              {uploading && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+            <label className="absolute bottom-0 right-0 bg-white text-black p-2 rounded-full cursor-pointer shadow-xl hover:scale-110 transition-all border-2 border-[#0a0a0a]">
+              <Camera size={14} />
+              <input type="file" className="hidden" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
+            </label>
+          </div>
+          <h2 className="text-2xl font-light tracking-tight text-white mb-1">
+            Mon <span className="font-bold">Profil</span>
+          </h2>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Personnalisez votre identité</p>
+        </div>
+
+        {/* Form Body */}
+        <div className="px-8 pb-10 overflow-y-auto space-y-8">
+          <form onSubmit={handleUpdate} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-2">Pseudo</label>
+              <div className="glass-panel rounded-[24px] p-1 border-white/5 focus-within:border-white/20 transition-all">
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 bg-transparent outline-none text-white placeholder-white/10 font-light"
+                  placeholder="Choisissez un pseudo..."
+                />
               </div>
-              <label className="absolute bottom-0 right-0 bg-indigo-500 p-2 rounded-full cursor-pointer shadow-lg hover:bg-indigo-400 transition-colors border-2 border-gray-900">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <input type="file" className="hidden" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
-              </label>
-            </div>
-            {uploading && <p className="text-indigo-400 text-xs mt-2 animate-pulse">Envoi en cours...</p>}
-          </div>
-
-          <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Nom d'utilisateur</label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-gray-600"
-                placeholder="Votre pseudo"
-              />
             </div>
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && <p className="text-red-400 text-[10px] text-center font-bold tracking-tight bg-red-400/10 py-2 rounded-full border border-red-400/20">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
+              className="w-full bg-white text-black font-bold py-4 rounded-full transition-all shadow-[0_15px_30px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-20 flex items-center justify-center gap-2"
             >
-              {loading ? 'Mise à jour...' : 'Sauvegarder'}
+              {loading && <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>}
+              SAUVEGARDER
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-800">
+          <div className="pt-4 border-t border-white/5">
             <button
               onClick={handleLogout}
-              className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-full border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-500 text-xs font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogOut size={16} />
               Se déconnecter
             </button>
           </div>

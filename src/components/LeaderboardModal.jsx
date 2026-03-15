@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { Trophy, X } from 'lucide-react';
 import UserProfileModal from './UserProfileModal';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -48,86 +49,109 @@ export default function LeaderboardModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-gray-950 animate-in slide-in-from-bottom duration-300">
-      {/* Header */}
-      <div className="px-4 py-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/80 backdrop-blur-md flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">🏆</span>
-          <div>
-            <h2 className="text-white font-bold text-lg leading-none">Top Stickers</h2>
-            <p className="text-gray-500 text-xs mt-0.5">Les membres les plus actifs</p>
-          </div>
-        </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-2 bg-gray-800 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
+        
+        {/* Close Button - Floating */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
+        >
+          <X className="w-5 h-5" />
         </button>
-      </div>
 
-      {/* Leaderboard */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+        {/* Header */}
+        <div className="px-8 pt-10 pb-6 flex flex-col items-center text-center">
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white mb-4 shadow-xl">
+            <Trophy size={24} className="text-yellow-400 opacity-90" />
           </div>
-        ) : leaderboard.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-gray-600">
-            <span className="text-4xl mb-3">🏆</span>
-            <p>Aucun classement disponible</p>
-          </div>
-        ) : (
-          leaderboard.map((member, index) => (
-            <button
-              key={member.id}
-              onClick={() => setViewingUserId(member.id)}
-              className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group ${
-                index === 0 ? 'bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20' :
-                index === 1 ? 'bg-gray-400/10 border-gray-400/20 hover:bg-gray-400/20' :
-                index === 2 ? 'bg-amber-600/10 border-amber-600/20 hover:bg-amber-600/20' :
-                'bg-gray-800/50 border-gray-800 hover:bg-gray-800'
-              }`}
-            >
-              {/* Rank */}
-              <div className="w-8 text-center flex-shrink-0">
-                {index < 3 ? (
-                  <span className="text-2xl">{MEDALS[index]}</span>
-                ) : (
-                  <span className="text-gray-500 font-bold text-lg group-hover:text-white transition-colors">#{index + 1}</span>
-                )}
-              </div>
+          <h2 className="text-2xl font-light tracking-tight text-white mb-1">
+            Top <span className="font-bold">Explorateurs</span>
+          </h2>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Les plus grands colleurs de stickers</p>
+        </div>
 
-              {/* Avatar */}
-              <div className="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0 group-hover:ring-2 group-hover:ring-indigo-400 transition-all">
-                {member.avatar_url ? (
-                  <img src={member.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className={`font-bold text-xl ${index === 0 ? 'text-yellow-400' : 'text-indigo-400'}`}>
-                    {member.username?.charAt(0).toUpperCase() || '?'}
-                  </span>
-                )}
-              </div>
+        {/* Leaderboard Body */}
+        <div className="flex-1 overflow-y-auto px-6 pb-10 space-y-4">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+              <p className="text-white/20 text-xs font-medium tracking-widest uppercase">Classement en cours...</p>
+            </div>
+          ) : leaderboard.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <span className="text-4xl mb-4 opacity-20">🏆</span>
+              <p className="text-white/40 font-light">Le classement est encore vide.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {leaderboard.map((member, index) => (
+                <button
+                  key={member.id}
+                  onClick={() => setViewingUserId(member.id)}
+                  className={`w-full flex items-center gap-4 p-4 rounded-[24px] border transition-all text-left relative overflow-hidden group ${
+                    index === 0 ? 'bg-yellow-400/5 border-yellow-400/20 shadow-[0_0_20px_rgba(250,204,21,0.05)]' :
+                    index === 1 ? 'bg-white/5 border-white/20' :
+                    index === 2 ? 'bg-amber-600/5 border-amber-600/20' :
+                    'bg-white/[0.02] border-white/5 hover:bg-white/[0.04]'
+                  }`}
+                >
+                  {/* Rank Indicator */}
+                  <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center relative">
+                    {index < 3 ? (
+                      <span className="text-2xl drop-shadow-lg">{MEDALS[index]}</span>
+                    ) : (
+                      <span className="text-white/20 font-bold text-sm tracking-tighter">#{index + 1}</span>
+                    )}
+                  </div>
 
-              {/* Name & count */}
-              <div className="flex-1 min-w-0">
-                <p className={`font-bold truncate group-hover:translate-x-1 transition-transform ${index === 0 ? 'text-yellow-300' : 'text-white'}`}>
-                  {member.username || 'Explorateur'}
-                </p>
-                <p className="text-gray-500 text-sm">{member.count} sticker{member.count > 1 ? 's' : ''}</p>
-              </div>
+                  {/* Avatar */}
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg flex-shrink-0 relative">
+                    {member.avatar_url ? (
+                      <img src={member.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className={`w-full h-full flex items-center justify-center font-bold text-lg ${
+                        index === 0 ? 'bg-yellow-400 text-black' : 'bg-white/5 text-white/40'
+                      }`}>
+                        {member.username?.charAt(0).toUpperCase() || '?'}
+                      </div>
+                    )}
+                    {index === 0 && (
+                      <div className="absolute inset-0 bg-yellow-400/10 animate-pulse pointer-events-none"></div>
+                    )}
+                  </div>
 
-              {/* Progress bar */}
-              <div className="w-20 flex-shrink-0">
-                <div className="bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : index === 2 ? 'bg-amber-500' : 'bg-indigo-500'}`}
-                    style={{ width: `${(member.count / (leaderboard[0]?.count || 1)) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </button>
-          ))
-        )}
+                  {/* Name & Count */}
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-medium truncate tracking-tight transition-transform group-hover:translate-x-1 ${
+                      index === 0 ? 'text-yellow-400' : 'text-white'
+                    }`}>
+                      {member.username || 'Anonyme'}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/30 text-[10px] font-bold uppercase tracking-wider">
+                        {member.count} <span className="font-light">sticker{member.count > 1 ? 's' : ''}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Progress Glow (Right side) */}
+                  <div className="w-1 h-8 rounded-full bg-white/5 overflow-hidden">
+                    <div 
+                      className={`w-full h-full rounded-full ${
+                        index === 0 ? 'bg-yellow-400' : 
+                        index === 1 ? 'bg-white/40' : 
+                        index === 2 ? 'bg-amber-600' : 
+                        'bg-white/10'
+                      }`}
+                      style={{ height: `${(member.count / (leaderboard[0]?.count || 1)) * 100}%` }}
+                    />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {viewingUserId && (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { X, Edit3, Trash2, Send, MapPin } from 'lucide-react';
 import EditStickerModal from './EditStickerModal';
 import UserProfileModal from './UserProfileModal';
 
@@ -109,180 +110,169 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
   if (!isOpen || !sticker) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-x-hidden">
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 flex-shrink-0">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="bg-[#0a0a0a] w-full max-w-lg rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
+        
+        {/* Close Button - Floating */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Header - Author Info */}
+        <div className="px-6 pt-8 pb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {loading ? (
-              <div className="w-10 h-10 bg-gray-800 rounded-full animate-pulse"></div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
-                  className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden hover:ring-2 hover:ring-indigo-400 transition-all cursor-pointer flex-shrink-0"
-                  title="Voir le profil"
-                >
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-indigo-400 font-bold text-lg">
-                      {profile?.username?.charAt(0).toUpperCase() || '?'}
-                    </span>
-                  )}
-                </button>
-                <div>
-                  <button
-                    onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
-                    className="text-white font-bold leading-none hover:text-indigo-300 transition-colors"
-                  >
-                    {profile?.username || 'Explorateur'}
-                  </button>
-                  <p className="text-gray-500 text-xs mt-1">
-                    {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
+            <button
+              onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer"
+            >
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/40 font-bold">
+                  {profile?.username?.charAt(0).toUpperCase() || '?'}
                 </div>
-              </div>
-            )}
+              )}
+            </button>
+            <div>
+              <p className="text-white font-medium tracking-tight">
+                {profile?.username || 'Anonyme'}
+              </p>
+              <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest mt-0.5">
+                {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            </div>
           </div>
+
           <div className="flex items-center gap-2">
             {isOwner && (
               <button
                 onClick={() => setIsEditOpen(true)}
-                className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 transition-colors text-sm font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1.5 rounded-full"
+                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/60 border border-white/5"
+                title="Éditer"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Éditer
+                <Edit3 size={18} />
               </button>
             )}
-            <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors p-2 bg-gray-800 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Photo */}
-          <div className="p-4 pb-0">
-            <div className="aspect-[4/5] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
-              <img src={sticker.photo_url} alt="Globe Sticker" className="w-full h-full object-contain" />
+        <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+          {/* Photo Container */}
+          <div className="w-full aspect-square sm:aspect-video rounded-[24px] overflow-hidden border border-white/5 bg-black/40 group relative">
+            <img src={sticker.photo_url} alt="Sticker" className="w-full h-full object-contain" />
+            <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-2">
+              <MapPin size={12} className="text-[#ccff00]" />
+              <span className="text-[10px] text-white/80 font-bold uppercase tracking-widest">{sticker.country_code || '📍 Monde'}</span>
             </div>
           </div>
 
           {/* Caption */}
           {sticker.caption && (
-            <div className="px-4 pt-4">
-              <div className="bg-indigo-500/5 p-4 rounded-2xl border border-indigo-500/10 italic text-gray-300">
-                "{sticker.caption}"
-              </div>
+            <div className="glass-panel rounded-[24px] p-5 border-white/5 bg-white/[0.02]">
+              <p className="text-white/80 font-light leading-relaxed italic">"{sticker.caption}"</p>
             </div>
           )}
 
           {/* Comments Section */}
-          <div className="p-4 space-y-3">
-            <h3 className="text-white font-bold text-sm uppercase tracking-wider flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              Commentaires ({comments.length})
-            </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Commentaires ({comments.length})</h3>
+            </div>
 
-            {comments.length === 0 && (
-              <p className="text-gray-600 text-sm text-center py-4">Soyez le premier à commenter ! 👋</p>
-            )}
-
-            {comments.map((comment) => {
-              const isCommentOwner = currentUser && currentUser.id === comment.user_id;
-              const isEditing = editingCommentId === comment.id;
-              return (
-                <div key={comment.id} className="flex gap-3">
-                  <div className="w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center border border-indigo-500/30 overflow-hidden flex-shrink-0 mt-1">
-                    {comment.profiles?.avatar_url ? (
-                      <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-indigo-400 font-bold text-xs">
-                        {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
-                      </span>
-                    )}
-                  </div>
-                  <div className="bg-gray-800 rounded-2xl rounded-tl-none px-3 py-2 flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <p className="text-indigo-400 text-xs font-bold">{comment.profiles?.username || 'Anonyme'}</p>
-                      {isCommentOwner && !isEditing && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => { setEditingCommentId(comment.id); setEditingContent(comment.content); }}
-                            className="text-gray-500 hover:text-indigo-400 transition-colors"
-                            title="Modifier"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-gray-500 hover:text-red-400 transition-colors"
-                            title="Supprimer"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    {isEditing ? (
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          autoFocus
-                          type="text"
-                          value={editingContent}
-                          onChange={(e) => setEditingContent(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') handleEditComment(comment.id); if (e.key === 'Escape') setEditingCommentId(null); }}
-                          className="flex-1 bg-gray-700 rounded-lg px-2 py-1 text-white text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                        />
-                        <button onClick={() => handleEditComment(comment.id)} className="text-green-400 hover:text-green-300 text-xs font-bold">OK</button>
-                        <button onClick={() => setEditingCommentId(null)} className="text-gray-500 hover:text-white text-xs">Annuler</button>
-                      </div>
-                    ) : (
-                      <p className="text-gray-200 text-sm">{comment.content}</p>
-                    )}
-                  </div>
+            <div className="space-y-3">
+              {comments.length === 0 ? (
+                <div className="py-10 text-center border border-dashed border-white/5 rounded-[24px]">
+                  <p className="text-white/20 text-xs font-light">Aucun message encore...</p>
                 </div>
-              );
-            })}
+              ) : (
+                comments.map((comment) => {
+                  const isCommentOwner = currentUser && currentUser.id === comment.user_id;
+                  const isEditing = editingCommentId === comment.id;
+                  return (
+                    <div key={comment.id} className="flex gap-3 group/comment">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10 shrink-0">
+                        {comment.profiles?.avatar_url ? (
+                          <img src={comment.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-white/5 flex items-center justify-center text-white/20 text-[10px] font-bold">
+                            {comment.profiles?.username?.charAt(0).toUpperCase() || '?'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 bg-white/[0.03] border border-white/5 rounded-[20px] rounded-tl-none p-3 relative">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="text-[#ccff00] text-[11px] font-bold tracking-tight">{comment.profiles?.username || 'Anonyme'}</p>
+                          {isCommentOwner && !isEditing && (
+                            <div className="flex items-center gap-2 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => { setEditingCommentId(comment.id); setEditingContent(comment.content); }}
+                                className="text-white/20 hover:text-white transition-colors"
+                              >
+                                <Edit3 size={12} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="text-white/20 hover:text-red-400 transition-colors"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {isEditing ? (
+                          <div className="flex gap-2 mt-1">
+                            <input
+                              autoFocus
+                              type="text"
+                              value={editingContent}
+                              onChange={(e) => setEditingContent(e.target.value)}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleEditComment(comment.id); if (e.key === 'Escape') setEditingCommentId(null); }}
+                              className="flex-1 bg-white/5 rounded-lg px-2 py-1 text-white text-xs outline-none border border-[#ccff00]/30"
+                            />
+                            <button onClick={() => handleEditComment(comment.id)} className="text-[#ccff00] font-bold text-[10px]">OK</button>
+                          </div>
+                        ) : (
+                          <p className="text-white/70 text-[13px] font-light leading-snug">{comment.content}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
 
-            {/* Comment Input */}
-            {currentUser ? (
-              <form onSubmit={handlePostComment} className="flex gap-2 pt-2">
+        {/* Comment Input Box - Sticky at bottom */}
+        <div className="p-4 bg-black/40 backdrop-blur-xl border-t border-white/5">
+          {currentUser ? (
+            <form onSubmit={handlePostComment} className="flex gap-2">
+              <div className="flex-1 glass-panel rounded-full border-white/5 p-1 flex items-center pr-2 focus-within:border-[#ccff00]/30 transition-all">
                 <input
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Écrire un commentaire..."
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-2xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-600"
+                  placeholder="Éclairez le globe..."
+                  className="flex-1 bg-transparent px-4 py-2 text-white text-[13px] outline-none placeholder-white/20 font-light"
                 />
                 <button
                   type="submit"
                   disabled={postingComment || !newComment.trim()}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white p-2.5 rounded-2xl transition-all flex-shrink-0"
+                  className="bg-white text-black p-2 rounded-full disabled:opacity-20 transition-all hover:scale-110"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  <Send size={16} />
                 </button>
-              </form>
-            ) : (
-              <p className="text-center text-gray-600 text-sm py-2">
-                <span className="text-indigo-400 font-semibold">Connectez-vous</span> pour laisser un commentaire.
-              </p>
-            )}
-          </div>
+              </div>
+            </form>
+          ) : (
+            <p className="text-center text-white/20 text-[10px] font-bold uppercase tracking-widest py-2">
+              Connectez-vous pour commenter
+            </p>
+          )}
         </div>
       </div>
 
