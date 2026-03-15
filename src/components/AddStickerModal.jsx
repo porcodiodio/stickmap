@@ -42,26 +42,34 @@ export default function AddStickerModal({ onClose, onAdd }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200 pb-safe">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
+      <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
+        {/* Close Button - Floating */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
+        >
+          <X size={20} />
+        </button>
+
         {/* Header */}
-        <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50/80 backdrop-blur-md sticky top-0 z-10">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Nouveau Sticker
+        <div className="px-8 pt-10 pb-6 flex flex-col items-center text-center">
+          <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white mb-4 shadow-xl">
+            <Upload size={24} className="opacity-80" />
+          </div>
+          <h2 className="text-2xl font-light tracking-tight text-white mb-1">
+            Nouveau <span className="font-bold">Sticker</span>
           </h2>
-          <button onClick={onClose} className="p-2 bg-gray-200/60 hover:bg-gray-300 rounded-full transition-colors text-gray-600">
-            <X size={20} />
-          </button>
+          <p className="text-white/40 text-xs uppercase tracking-widest font-bold">Marquez votre passage</p>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
+        <form onSubmit={handleSubmit} className="px-8 pb-10 overflow-y-auto space-y-8">
           
           {/* Photo Upload Area */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Photo de votre sticker</label>
-            <div className="w-full h-48 rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 transition-colors flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
+          <div className="space-y-3">
+            <div className="w-full h-52 glass-card border-dashed border-white/20 bg-white/[0.02] hover:bg-white/[0.05] transition-all flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
               <input 
                 type="file" 
                 accept="image/*"
@@ -77,65 +85,62 @@ export default function AddStickerModal({ onClose, onAdd }) {
                 <img src={photo} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <>
-                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 mb-3 group-hover:scale-110 transition-transform shadow-sm">
-                    <Camera size={24} />
+                  <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform border border-white/10">
+                    <Camera size={26} className="opacity-60" />
                   </div>
-                  <span className="text-indigo-600 font-medium">Prendre une photo</span>
-                  <span className="text-xs text-indigo-400 mt-1">ou choisir depuis la galerie</span>
+                  <span className="text-white/80 font-medium">Capturer le moment</span>
+                  <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">ou parcourir la galerie</span>
                 </>
               )}
             </div>
           </div>
 
           {/* Caption Area */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Un petit mot ? (Optionnel)</label>
-            <textarea
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Racontez votre souvenir en quelques mots..."
-              className="w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none h-24 text-gray-700 font-medium"
-            />
-          </div>
-
-
-          {/* Location Area */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Votre Position Actuelle</label>
-            <div 
-              onClick={handleGetLocation}
-              className={`w-full p-4 rounded-2xl border ${location ? 'border-green-200 bg-green-50/50 text-green-700' : 'border-gray-200 bg-gray-50 hover:bg-indigo-50 hover:border-indigo-200 text-gray-600'} cursor-pointer flex items-center justify-between transition-colors`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${location ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
-                  <MapPin size={20} />
-                </div>
-                <div>
-                  <p className="font-medium">
-                    {location ? 'Position enregistrée' : 'Obtenir ma position'}
-                  </p>
-                  {location && (
-                    <p className="text-xs opacity-70">
-                      {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {isLocating && (
-                <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-              )}
+          <div className="space-y-3">
+            <div className="glass-panel rounded-[24px] p-1 border-white/5 focus-within:border-white/20 transition-all">
+              <textarea
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Un petit mot ? (Optionnel)"
+                className="w-full p-4 bg-transparent outline-none resize-none h-24 text-white placeholder-white/20 font-light"
+              />
             </div>
           </div>
 
+          {/* Location Area */}
+          <div 
+            onClick={handleGetLocation}
+            className={`glass-panel rounded-[24px] p-5 border-white/5 hover:border-white/20 cursor-pointer flex items-center justify-between transition-all group ${location ? 'bg-white/[0.05]' : ''}`}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${location ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'bg-white/5 text-white/40 border border-white/10'}`}>
+                <MapPin size={22} />
+              </div>
+              <div>
+                <p className={`font-medium ${location ? 'text-white' : 'text-white/60'}`}>
+                  {location ? 'Position verrouillée' : 'Géolocalisation'}
+                </p>
+                {location && (
+                  <p className="text-[10px] text-white/30 font-mono tracking-tighter">
+                    {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                  </p>
+                )}
+              </div>
+            </div>
+            {isLocating && (
+              <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+            )}
+          </div>
+
           {/* Submit Action */}
-          <div className="pt-4">
+          <div className="pt-2">
             <button 
               type="submit"
               disabled={!photo || !location}
-              className="w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all focus:ring-4 focus:ring-indigo-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-indigo-500 hover:from-indigo-600 to-purple-600 hover:to-purple-700 flex items-center justify-center gap-2"
+              className="w-full py-5 rounded-full font-bold text-black bg-white shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:shadow-[0_20px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
-              <Upload size={20} />
-              Coller mon Sticker !
+              <Upload size={20} strokeWidth={3} />
+              PUBLIER LE STICKER
             </button>
           </div>
         </form>
