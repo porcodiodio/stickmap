@@ -61,7 +61,6 @@ export default function AddStickerModal({ onClose, onAdd }) {
           <h2 className="text-2xl font-light tracking-tight text-white mb-1">
             Nouveau <span className="font-bold">Sticker</span>
           </h2>
-          <p className="text-white/40 text-xs uppercase tracking-widest font-bold">Marquez votre passage</p>
         </div>
 
         {/* Form Body */}
@@ -101,7 +100,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
               <textarea
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="Un petit mot ? (Optionnel)"
+                placeholder="Dis nous en plus ! (optionnel)"
                 className="w-full p-4 bg-transparent outline-none resize-none h-24 text-white placeholder-white/20 font-light"
               />
             </div>
@@ -110,18 +109,18 @@ export default function AddStickerModal({ onClose, onAdd }) {
           {/* Location Area */}
           <div 
             onClick={handleGetLocation}
-            className={`glass-panel rounded-[24px] p-5 border-white/5 hover:border-white/20 cursor-pointer flex items-center justify-between transition-all group ${location ? 'bg-white/[0.05]' : ''}`}
+            className={`glass-panel rounded-[24px] p-5 transition-all group border-white/5 ${location ? 'bg-[#ccff00]/5 border-[#ccff00]/20' : 'hover:border-white/20 cursor-pointer'}`}
           >
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${location ? 'bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'bg-white/5 text-white/40 border border-white/10'}`}>
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${location ? 'bg-[#ccff00] text-black shadow-[0_0_20px_rgba(204,255,0,0.4)]' : 'bg-white/5 text-white/40 border border-white/10'}`}>
                 <MapPin size={22} />
               </div>
               <div>
-                <p className={`font-medium ${location ? 'text-white' : 'text-white/60'}`}>
+                <p className={`font-medium transition-colors ${location ? 'text-[#ccff00]' : 'text-white/60'}`}>
                   {location ? 'Position verrouillée' : 'Géolocalisation'}
                 </p>
                 {location && (
-                  <p className="text-[10px] text-white/30 font-mono tracking-tighter">
+                  <p className="text-[10px] text-[#ccff00]/50 font-mono tracking-tighter">
                     {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
                   </p>
                 )}
@@ -140,7 +139,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
               className="w-full py-5 rounded-full font-bold text-black bg-white shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:shadow-[0_20px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               <Upload size={20} strokeWidth={3} />
-              PUBLIER LE STICKER
+              COLLER MON STICKER
             </button>
           </div>
         </form>
