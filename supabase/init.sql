@@ -1,4 +1,4 @@
--- Script de création des tables pour StickMap (à lancer dans le SQL Editor de Supabase)
+-- Script de création des tables pour Milano Stickerini (à lancer dans le SQL Editor de Supabase)
 
 -- 1. Table Profils (Infos publiques des utilisateurs)
 CREATE TABLE IF NOT EXISTS public.profiles (

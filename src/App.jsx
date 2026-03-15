@@ -137,7 +137,7 @@ function App() {
         <div className="flex flex-col items-center">
           <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-0.5">Explore the World</span>
           <h1 className="text-2xl font-light tracking-tight text-white">
-            Stick<span className="font-bold">Map</span>
+            Milano <span className="font-bold">Stickerini</span>
           </h1>
         </div>
       </header>

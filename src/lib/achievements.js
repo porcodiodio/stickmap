@@ -1,5 +1,5 @@
 /**
- * StickMap Achievement Definitions
+ * Milano Stickerini Achievement Definitions
  * Each achievement has:
  * - id: unique key
  * - icon: emoji
