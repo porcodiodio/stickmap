@@ -115,7 +115,7 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
         projection="globe"
         fog={{
           'range': [0.8, 8],
-          'color': '#ffffff', // Very light white for the atmosphere
+          'color': '#141414', // Very subtle white glow (8% opacity equivalent)
           'horizon-blend': 0.3,
           'high-color': '#000000',
           'space-color': '#000000',
