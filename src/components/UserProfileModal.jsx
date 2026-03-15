@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { X, MapPin, Trophy } from 'lucide-react';
 import { computeAchievements } from '../lib/achievements';
 
 // Convert ISO 3166-1 alpha-3 -> alpha-2 for flag emojis
