@@ -131,12 +131,27 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col w-full max-w-md mx-auto bg-gray-900 shadow-2xl relative overflow-hidden">
-      {/* Compact Header - Logo only */}
-      <header className="px-4 py-3 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 absolute top-0 w-full z-20 flex justify-center items-center">
-        <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent drop-shadow-sm">
-          StickMap
-        </h1>
+    <div className="min-h-screen flex flex-col w-full max-w-md mx-auto bg-black text-white shadow-2xl relative overflow-hidden mesh-gradient">
+      {/* Ultra-Premium Header */}
+      <header className="px-6 py-5 absolute top-0 w-full z-20 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
+        <div className="flex flex-col">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-bold mb-0.5">Explore the World</span>
+          <h1 className="text-2xl font-light tracking-tight text-white">
+            Stick<span className="font-bold">Map</span>
+          </h1>
+        </div>
+        <button 
+          onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
+          className="w-10 h-10 rounded-full glass-panel flex items-center justify-center overflow-hidden border-white/20"
+        >
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-black flex items-center justify-center text-xs font-bold">
+              {profile?.username?.charAt(0).toUpperCase() || "U"}
+            </div>
+          )}
+        </button>
       </header>
 
       {/* Main Map Content - Full space */}
@@ -148,67 +163,54 @@ function App() {
         />
       </main>
 
-      {/* Mobile Navigation Bar - 5 icons */}
-      <nav className="absolute bottom-0 w-full bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 px-2 py-2 flex justify-around items-center z-20 pb-safe">
-        {/* 1. Feed */}
-        <button
-          onClick={() => setIsFeedOpen(true)}
-          className="flex flex-col items-center gap-1 text-gray-400 hover:text-orange-400 transition-colors p-2"
-        >
-          <span className="text-2xl">🔥</span>
-          <span className="text-[9px] uppercase tracking-wider font-bold">Actus</span>
-        </button>
+      {/* Floating Glassmorphic Navigation */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[360px] z-30">
+        <nav className="glass-panel rounded-full px-6 py-3 flex justify-between items-center shadow-[0_20px_40px_rgba(0,0,0,0.4)] border-white/20">
+          {/* 1. Feed */}
+          <button
+            onClick={() => setIsFeedOpen(true)}
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </button>
 
-        {/* 2. Leaderboard */}
-        <button
-          onClick={() => setIsLeaderboardOpen(true)}
-          className="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-400 transition-colors p-2"
-        >
-          <span className="text-2xl">🏆</span>
-          <span className="text-[9px] uppercase tracking-wider font-bold">Top</span>
-        </button>
+          {/* 2. Leaderboard */}
+          <button
+            onClick={() => setIsLeaderboardOpen(true)}
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
 
-        {/* 3. Add Sticker (center CTA) */}
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="w-14 h-14 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] transform -translate-y-4 hover:scale-105 active:scale-95 transition-all outline-none ring-4 ring-gray-900 cursor-pointer relative"
-        >
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-          {isUploading && (
-            <span className="absolute top-0 right-0 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-            </span>
-          )}
-        </button>
+          {/* 3. Add Sticker (center CTA) */}
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:scale-110 active:scale-95 transition-all outline-none ring-4 ring-transparent border-none"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
 
-        {/* 4. Placeholder - future feature */}
-        <button className="flex flex-col items-center gap-1 text-gray-600 p-2 cursor-not-allowed opacity-50">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          <span className="text-[9px] uppercase tracking-wider font-bold">Bientôt</span>
-        </button>
+          {/* 4. Placeholder - future feature */}
+          <button className="flex flex-col items-center gap-1 text-white/20 cursor-not-allowed">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+          </button>
 
-        {/* 5. Profile */}
-        <button
-          onClick={() => user ? setIsProfileModalOpen(true) : setIsAuthModalOpen(true)}
-          className="flex flex-col items-center gap-1 text-gray-400 hover:text-indigo-400 transition-colors p-2"
-        >
-          <div className="w-7 h-7 rounded-full bg-gray-700 border border-gray-600 overflow-hidden flex items-center justify-center">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-            ) : user ? (
-              <span className="text-white font-bold text-xs">{profile?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}</span>
-            ) : (
-              <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            )}
-          </div>
-          <span className="text-[9px] uppercase tracking-wider font-bold">Profil</span>
-        </button>
-      </nav>
+          {/* 5. Details/Search */}
+          <button className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </nav>
+      </div>
 
       {/* Modals */}
       {isAddModalOpen && (

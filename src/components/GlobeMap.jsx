@@ -77,7 +77,7 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
     return countriesWithStickers.map(code => ISO_TO_NAME_MAP[code]).filter(Boolean);
   }, [countriesWithStickers]);
 
-  // Style de la couche GeoJSON
+  // Style de la couche GeoJSON - Updated for Premium Rainbow/Mesh aesthetic
   const countryLayerStyle = {
     id: 'countries',
     type: 'fill',
@@ -88,24 +88,23 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
           ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
           ['in', ['get', 'name'], ['literal', namesWithStickers]]
         ],
-        '#6366f1',
+        'rgba(255, 255, 255, 0.05)', // Subtle glass fill for active countries
         'rgba(0,0,0,0)'
       ],
-      'fill-opacity': 0.4,
       'fill-outline-color': [
         'case',
         ['any', 
           ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', countriesWithStickers]],
           ['in', ['get', 'name'], ['literal', namesWithStickers]]
         ],
-        '#4f46e5',
+        'rgba(255, 255, 255, 0.4)', // Sharp thin white border
         'rgba(0,0,0,0)'
       ]
     }
   };
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-[#1a1c29]">
+    <div className="absolute inset-0 w-full h-full bg-black">
       <Map
         ref={mapRef}
         {...viewState}
@@ -114,6 +113,14 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
         mapStyle="mapbox://styles/mapbox/dark-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
         projection="globe"
+        fog={{
+          'range': [0.5, 10],
+          'color': '#000000',
+          'horizon-blend': 0.1,
+          'high-color': '#111111',
+          'space-color': '#000000',
+          'star-intensity': 0.2
+        }}
       >
         {/* Layer pour colorer les pays */}
         {countriesWithStickers.length > 0 && (
@@ -134,11 +141,12 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
               onSelectSticker(sticker);
             }}
           >
-            <div className="group cursor-pointer transform transition-transform hover:scale-110 relative z-10">
-              <div className="w-10 h-10 bg-white rounded-full p-1 shadow-lg border-2 border-indigo-500 overflow-hidden shrink-0">
+            <div className="group cursor-pointer transform transition-all hover:scale-110 relative z-10">
+              <div className="w-12 h-12 glass-panel rounded-full p-1 shadow-2xl overflow-hidden shrink-0 border-white/30">
                 <img src={sticker.photo_url} alt="Sticker" className="w-full h-full object-cover rounded-full" />
               </div>
-              <div className="absolute top-full left-1/2 -ml-1 w-2 h-2 bg-indigo-500 transform rotate-45 -mt-2"></div>
+              {/* Subtle indicator glow */}
+              <div className="absolute -inset-1 rounded-full bg-white/20 blur-md -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </Marker>
         ))}
