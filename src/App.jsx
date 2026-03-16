@@ -10,11 +10,13 @@ import StickerDetailModal from './components/StickerDetailModal'
 import FeedModal from './components/FeedModal'
 import LeaderboardModal from './components/LeaderboardModal'
 import ClaimScannerModal from './components/ClaimScannerModal'
+import SplashScreen from './components/SplashScreen'
 import { supabase } from './lib/supabase'
 
 function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [isSplashVisible, setIsSplashVisible] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -144,6 +146,8 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col w-full max-w-md mx-auto bg-black text-white shadow-2xl relative overflow-hidden mesh-gradient">
+      {isSplashVisible && <SplashScreen onFinish={() => setIsSplashVisible(false)} />}
+      
       {/* Ultra-Premium Header */}
       <header className="px-6 py-5 absolute top-0 w-full z-20 flex justify-center items-center bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex flex-col items-center">
