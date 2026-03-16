@@ -160,17 +160,17 @@ function App() {
           {/* 1. Feed */}
           <button
             onClick={() => setIsFeedOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-orange-500 transition-all transform active:scale-90 group"
+            className="flex flex-col items-center gap-1 transition-all transform active:scale-90 group"
           >
-            <Flame size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
+            <Flame size={22} className="text-orange-500/80 group-hover:text-orange-500 transition-colors group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
           </button>
 
           {/* 2. Leaderboard */}
           <button
             onClick={() => setIsLeaderboardOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-yellow-400 transition-all transform active:scale-90 group"
+            className="flex flex-col items-center gap-1 transition-all transform active:scale-90 group"
           >
-            <Trophy size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
+            <Trophy size={22} className="text-yellow-400/80 group-hover:text-yellow-400 transition-colors group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
           </button>
 
           {/* 3. Add Sticker (center CTA) */}
@@ -184,9 +184,9 @@ function App() {
           {/* 4. Scanner */}
           <button 
             onClick={() => user ? setIsScannerOpen(true) : setIsAuthModalOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-[#ccff00] transition-all transform active:scale-90 group"
+            className="flex flex-col items-center gap-1 transition-all transform active:scale-90 group"
           >
-            <QrCode size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]" />
+            <QrCode size={22} className="text-[#ccff00]/80 group-hover:text-[#ccff00] transition-colors group-hover:drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]" />
           </button>
 
           {/* 5. Profile */}
