@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import { Flame, X } from 'lucide-react';
 import UserProfileModal from './UserProfileModal';
+import { getFlagEmoji } from '../lib/countryUtils';
 
 export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
   const [stickers, setStickers] = useState([]);
@@ -122,7 +121,9 @@ export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
                       <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 shrink-0">
                         <img src={sticker.photo_url} alt="sticker" className="w-full h-full object-cover" />
                       </div>
-                      <span className="text-white/30 text-[10px] uppercase font-bold tracking-wider truncate">📍 {sticker.country_code || 'Inconnu'}</span>
+                      <span className="text-2xl" title={sticker.country_code}>
+                        {getFlagEmoji(sticker.country_code) || '🏳️‍🌈'}
+                      </span>
                     </div>
                   </div>
                 </button>
