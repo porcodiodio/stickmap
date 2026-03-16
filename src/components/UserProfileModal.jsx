@@ -30,7 +30,7 @@ export default function UserProfileModal({ userId, onClose }) {
         supabase.from('stickers').select('country_code, points').eq('user_id', userId),
         supabase.from('sticker_comments').select('id', { count: 'exact', head: true }).eq('user_id', userId),
         supabase.from('sticker_claims').select('sticker_id, stickers(points)').eq('user_id', userId),
-        supabase.from('physical_qrcodes').select('points').eq('claimed_by', userId)
+        supabase.from('physical_qr_claims').select('physical_qrcodes(points)').eq('user_id', userId)
       ]);
 
       setProfile(profileData);
@@ -41,7 +41,7 @@ export default function UserProfileModal({ userId, onClose }) {
       // Points calculation
       const stickersPoints = (stickersData || []).reduce((acc, s) => acc + (s.points || 10), 0);
       const claimsPoints = (claimsData || []).reduce((acc, c) => acc + (c.stickers?.points || 10), 0);
-      const physicalPoints = (physicalClaimsData || []).reduce((acc, p) => acc + (p.points || 10), 0);
+      const physicalPoints = (physicalClaimsData || []).reduce((acc, p) => acc + (p.physical_qrcodes?.points || 10), 0);
       
       setScore(stickersPoints + claimsPoints + physicalPoints);
 

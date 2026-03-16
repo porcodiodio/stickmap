@@ -37,22 +37,23 @@ export default function ClaimScannerModal({ isOpen, onClose, onClaimSuccess }) {
         .single();
 
       if (physicalCode) {
-        if (physicalCode.claimed_by) {
-          setStatus('error');
-          setMessage('Désolé, ce code a déjà été réclamé par un autre Stickerino !');
+        // Try to insert a claim
+        const { error: claimError } = await supabase
+          .from('physical_qr_claims')
+          .insert({ 
+            user_id: user.id,
+            qrcode_id: physicalCode.id
+          });
+
+        if (claimError) {
+          if (claimError.code === '23505') {
+            setStatus('error');
+            setMessage('Tu as déjà scanné ce code physique !');
+          } else {
+            throw claimError;
+          }
           return;
         }
-
-        // Claim it!
-        const { error: claimError } = await supabase
-          .from('physical_qrcodes')
-          .update({ 
-            claimed_by: user.id,
-            claimed_at: new Date().toISOString()
-          })
-          .eq('id', physicalCode.id);
-
-        if (claimError) throw claimError;
 
         setStatus('success');
         setMessage(`Bravo ! Tu as trouvé un code physique. +${physicalCode.points || 10} puntos !`);

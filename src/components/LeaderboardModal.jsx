@@ -30,9 +30,8 @@ export default function LeaderboardModal({ isOpen, onClose }) {
 
       // 3. Fetch all physical claims
       const { data: physicalClaimsData } = await supabase
-        .from('physical_qrcodes')
-        .select('claimed_by, points')
-        .not('claimed_by', 'is', null);
+        .from('physical_qr_claims')
+        .select('user_id, physical_qrcodes(points)');
 
       // 4. Aggregate scores
       const scores = {};
@@ -50,7 +49,9 @@ export default function LeaderboardModal({ isOpen, onClose }) {
       });
 
       (physicalClaimsData || []).forEach(p => {
-        scores[p.claimed_by] = (scores[p.claimed_by] || 0) + (p.points || 10);
+        if (!p.user_id) return;
+        const pts = p.physical_qrcodes?.points || 10;
+        scores[p.user_id] = (scores[p.user_id] || 0) + pts;
       });
 
       // 4. Fetch profiles

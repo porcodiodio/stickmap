@@ -26,12 +26,12 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
       ] = await Promise.all([
         supabase.from('stickers').select('points').eq('user_id', user.id),
         supabase.from('sticker_claims').select('stickers(points)').eq('user_id', user.id),
-        supabase.from('physical_qrcodes').select('points').eq('claimed_by', user.id)
+        supabase.from('physical_qr_claims').select('physical_qrcodes(points)').eq('user_id', user.id)
       ]);
 
       const sPoints = (stickersData || []).reduce((acc, s) => acc + (s.points || 10), 0);
       const cPoints = (claimsData || []).reduce((acc, c) => acc + (c.stickers?.points || 10), 0);
-      const pPoints = (physicalClaimsData || []).reduce((acc, p) => acc + (p.points || 10), 0);
+      const pPoints = (physicalClaimsData || []).reduce((acc, p) => acc + (p.physical_qrcodes?.points || 10), 0);
       
       setStats({
         stickers: stickersData?.length || 0,
