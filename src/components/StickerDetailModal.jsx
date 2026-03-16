@@ -115,11 +115,11 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
       <div className="bg-[#0a0a0a] w-full max-w-lg rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
         {/* Header - Author Info & Actions */}
-        <div className="px-6 pt-8 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="px-6 pt-8 pb-4 flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0">
             <button
               onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
-              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer flex-shrink-0"
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer flex-shrink-0 mt-1"
             >
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -129,27 +129,28 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
                 </div>
               )}
             </button>
-            <div className="min-w-0">
-              <p className="text-white font-medium tracking-tight truncate">
+            <div className="min-w-0 flex flex-col gap-2">
+              <p className="text-xl font-bold text-white tracking-tight truncate leading-tight">
                 {profile?.username || 'Anonyme'}
               </p>
-              <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest mt-0.5">
-                {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </p>
-            </div>
-            
-            {/* Points Badge moved next to pseudo */}
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20 flex-shrink-0 ml-1">
-              <Sparkles size={12} className="text-[#ccff00]" />
-              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PUNTOS</span>
+              <div className="flex items-center gap-3">
+                <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest">
+                  {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+                {/* Points Badge - Moved below username for safety and better vertical flow */}
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20 flex-shrink-0">
+                  <Sparkles size={10} className="text-[#ccff00]" />
+                  <span className="text-[9px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PUNTOS</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0 mt-1">
             {isOwner && (
               <button
                 onClick={() => setIsEditOpen(true)}
-                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/60 border border-white/5 shadow-xl"
+                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/60 border border-white/5 shadow-xl hover:scale-105 active:scale-95"
                 title="Éditer"
               >
                 <Edit3 size={18} />
@@ -157,7 +158,7 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
             )}
             <button 
               onClick={onClose} 
-              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 border border-white/5 shadow-xl"
+              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 border border-white/5 shadow-xl hover:scale-105 active:scale-95"
             >
               <X size={18} />
             </button>
