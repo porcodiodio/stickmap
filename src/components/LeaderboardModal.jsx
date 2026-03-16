@@ -28,7 +28,13 @@ export default function LeaderboardModal({ isOpen, onClose }) {
         .from('sticker_claims')
         .select('user_id, stickers(points)');
 
-      // 3. Aggregate scores
+      // 3. Fetch all physical claims
+      const { data: physicalClaimsData } = await supabase
+        .from('physical_qrcodes')
+        .select('claimed_by, points')
+        .not('claimed_by', 'is', null);
+
+      // 4. Aggregate scores
       const scores = {};
       const stickerCounts = {};
       
@@ -41,6 +47,10 @@ export default function LeaderboardModal({ isOpen, onClose }) {
         if (!c.user_id) return;
         const pts = c.stickers?.points || 10;
         scores[c.user_id] = (scores[c.user_id] || 0) + pts;
+      });
+
+      (physicalClaimsData || []).forEach(p => {
+        scores[p.claimed_by] = (scores[p.claimed_by] || 0) + (p.points || 10);
       });
 
       // 4. Fetch profiles

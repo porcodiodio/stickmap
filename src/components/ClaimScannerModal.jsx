@@ -25,11 +25,43 @@ export default function ClaimScannerModal({ isOpen, onClose, onClaimSuccess }) {
       const { data: { user } } = await supabase.auth.getSession();
       if (!user) {
         setStatus('error');
-        setMessage('Vous devez être connecté pour collecter des points.');
+        setMessage('Vous devez être connecté pour collecter des puntos.');
         return;
       }
 
-      // 2. Find sticker by claim_code
+      // 2. Check in physical_qrcodes first (Unique one-time use)
+      const { data: physicalCode, error: physicalError } = await supabase
+        .from('physical_qrcodes')
+        .select('*')
+        .eq('code', code)
+        .single();
+
+      if (physicalCode) {
+        if (physicalCode.claimed_by) {
+          setStatus('error');
+          setMessage('Désolé, ce code a déjà été réclamé par un autre Stickerino !');
+          return;
+        }
+
+        // Claim it!
+        const { error: claimError } = await supabase
+          .from('physical_qrcodes')
+          .update({ 
+            claimed_by: user.id,
+            claimed_at: new Date().toISOString()
+          })
+          .eq('id', physicalCode.id);
+
+        if (claimError) throw claimError;
+
+        setStatus('success');
+        setMessage(`Bravo ! Tu as trouvé un code physique. +${physicalCode.points || 10} puntos !`);
+        onClaimSuccess?.();
+        setTimeout(() => onClose(), 3000);
+        return;
+      }
+
+      // 3. Fallback: Find sticker by claim_code (Legacy stickers)
       const { data: sticker, error: stickerError } = await supabase
         .from('stickers')
         .select('id, points, user_id')
@@ -42,37 +74,35 @@ export default function ClaimScannerModal({ isOpen, onClose, onClaimSuccess }) {
         return;
       }
 
-      // Check if user is the owner (optional: maybe owners can't claim their own stickers)
+      // Check if user is the owner
       if (sticker.user_id === user.id) {
         setStatus('error');
-        setMessage('Vous ne pouvez pas collecter les points de votre propre sticker !');
+        setMessage('C\'est ton propre sticker, tu ne peux pas collecter tes propres puntos !');
         return;
       }
 
-      // 3. Insert claim
-      const { error: claimError } = await supabase
+      // 4. Insert sticker claim
+      const { error: sClaimError } = await supabase
         .from('sticker_claims')
         .insert({
           user_id: user.id,
           sticker_id: sticker.id
         });
 
-      if (claimError) {
-        if (claimError.code === '23505') {
+      if (sClaimError) {
+        if (sClaimError.code === '23505') {
           setStatus('error');
-          setMessage('Vous avez déjà collecté les points de ce sticker !');
+          setMessage('Tu as déjà scanné ce Milano Stickerini !');
         } else {
-          throw claimError;
+          throw sClaimError;
         }
         return;
       }
 
       // Success!
       setStatus('success');
-      setMessage(`Félicitations ! Vous avez gagné ${sticker.points || 10} points.`);
+      setMessage(`Félicitations ! +${sticker.points || 10} puntos collectés.`);
       onClaimSuccess?.();
-      
-      // Auto close after 3s
       setTimeout(() => onClose(), 3000);
 
     } catch (err) {
