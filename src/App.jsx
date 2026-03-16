@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Flame, Trophy, QrCode, Plus } from 'lucide-react';
 import axios from 'axios';
 import './App.css'
 import GlobeMap from './components/GlobeMap'
@@ -159,41 +160,33 @@ function App() {
           {/* 1. Feed */}
           <button
             onClick={() => setIsFeedOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-orange-500 transition-all transform active:scale-90 group"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
+            <Flame size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
           </button>
 
           {/* 2. Leaderboard */}
           <button
             onClick={() => setIsLeaderboardOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-yellow-400 transition-all transform active:scale-90 group"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+            <Trophy size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
           </button>
 
           {/* 3. Add Sticker (center CTA) */}
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:scale-110 active:scale-95 transition-all outline-none ring-4 ring-transparent border-none"
+            className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:scale-110 active:scale-95 transition-all outline-none border-none group"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus size={28} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
 
           {/* 4. Scanner */}
           <button 
             onClick={() => user ? setIsScannerOpen(true) : setIsAuthModalOpen(true)}
-            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-[#ccff00] transition-all transform active:scale-90 group"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m0 11v1m4-12h1a2 2 0 012 2v1m-16 0V7a2 2 0 012-2h1m12 11v1a2 2 0 01-2 2h-1m-6 0H7a2 2 0 01-2-2v-1M8 12h8" />
-            </svg>
+            <QrCode size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]" />
           </button>
 
           {/* 5. Profile */}
