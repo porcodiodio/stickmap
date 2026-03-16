@@ -66,9 +66,9 @@ export default function FeedModal({ isOpen, onClose, onSelectSticker }) {
             <Flame size={24} className="text-orange-500 opacity-90" />
           </div>
           <h2 className="text-2xl font-light tracking-tight text-white mb-1">
-            Dernières <span className="font-bold">Découvertes</span>
+            Nouvelle <span className="font-bold">propaganda</span>
           </h2>
-          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Activité récente de la communauté</p>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Les derniers collages tout frais</p>
         </div>
 
         {/* Feed Body */}
