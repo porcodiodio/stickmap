@@ -52,19 +52,40 @@ export default function EditStickerModal({ sticker, onClose, onUpdated }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("Es-tu sûr de vouloir supprimer ce stickos ? Cette action est irréversible.")) return;
+    
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('stickers')
+        .delete()
+        .eq('id', sticker.id);
+
+      if (deleteError) throw deleteError;
+      onUpdated();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
-        <div className="p-5 border-b border-gray-800 flex justify-between items-center">
-          <h2 className="text-white font-bold text-lg">Modifier le sticker</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white p-2 bg-gray-800 rounded-full">
+      <div className="bg-[#0a0a0a] border border-white/10 rounded-[32px] w-full max-w-sm overflow-hidden shadow-2xl mesh-gradient">
+        <div className="p-6 border-b border-white/5 flex justify-between items-center">
+          <h2 className="text-white font-light text-xl tracking-tight">Modifier le <span className="font-bold">Stickos</span></h2>
+          <button onClick={onClose} className="text-white/40 hover:text-white p-2 bg-white/5 rounded-full transition-colors">
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Photo */}
-          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-2 border-dashed border-gray-700 cursor-pointer group">
+          <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border border-white/10 cursor-pointer group shadow-xl">
             <input
               type="file"
               accept="image/*"
@@ -79,25 +100,38 @@ export default function EditStickerModal({ sticker, onClose, onUpdated }) {
 
           {/* Caption */}
           <div>
-            <label className="block text-sm font-semibold text-gray-400 mb-1">Description</label>
-            <textarea
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Décrivez votre souvenir..."
-              className="w-full bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 text-white resize-none h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-600 text-sm"
-            />
+            <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Description</label>
+            <div className="glass-panel rounded-2xl p-1 border-white/5 focus-within:border-white/20 transition-all">
+              <textarea
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Dis nous en plus..."
+                className="w-full bg-transparent border-none px-4 py-3 text-white resize-none h-24 focus:outline-none placeholder-white/10 text-sm font-light"
+              />
+            </div>
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-red-400 text-xs font-medium bg-red-400/10 p-3 rounded-xl border border-red-400/20">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-3 rounded-2xl transition-all flex items-center justify-center gap-2"
-          >
-            <Upload size={18} />
-            {loading ? 'Enregistrement...' : 'Sauvegarder les modifications'}
-          </button>
+          <div className="space-y-3 pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white hover:bg-white/90 disabled:opacity-20 text-black font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2 shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Upload size={18} strokeWidth={3} />
+              {loading ? 'Enregistrement...' : 'Sauvegarder les modifications'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={loading}
+              className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 font-bold py-4 rounded-full transition-all flex items-center justify-center gap-2 border border-red-500/20 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Supprimer mon stickos
+            </button>
+          </div>
         </form>
       </div>
     </div>
