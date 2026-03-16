@@ -59,7 +59,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
             <Upload size={24} className="opacity-80" />
           </div>
           <h2 className="text-2xl font-light tracking-tight text-white mb-1">
-            Nouveau <span className="font-bold">Sticker</span>
+            Ajouter un <span className="font-bold">Stickos</span>
           </h2>
         </div>
 
@@ -87,7 +87,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
                   <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform border border-white/10">
                     <Camera size={26} className="opacity-60" />
                   </div>
-                  <span className="text-white/80 font-medium">Capturer le moment</span>
+                  <span className="text-white/80 font-medium">Ajouter une photo</span>
                   <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">ou parcourir la galerie</span>
                 </>
               )}
@@ -139,7 +139,7 @@ export default function AddStickerModal({ onClose, onAdd }) {
               className="w-full py-5 rounded-full font-bold text-black bg-white shadow-[0_20px_40px_rgba(255,255,255,0.1)] hover:shadow-[0_20px_40px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center gap-3"
             >
               <Upload size={20} strokeWidth={3} />
-              COLLER MON STICKER
+              COLLER MON MILANO STICKERINI
             </button>
           </div>
         </form>
