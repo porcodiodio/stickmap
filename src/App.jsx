@@ -53,34 +53,42 @@ function App() {
     try {
       setIsUploading(true);
       
-      // 0. Reverse Geocoding to get Country Code (ISO-A3 expected by GeoJSON)
+      // 0. Reverse Geocoding to get Country Code and POI info
       let countryCode = null;
+      let poiName = null;
+      let poiCategory = null;
+
       try {
         const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
         const geoResponse = await axios.get(
           `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${data.location.lng}&latitude=${data.location.lat}&access_token=${MAPBOX_TOKEN}`
         );
         
-        // Find the country feature
         const features = geoResponse.data.features;
         console.log("Geocoding features found:", features);
         
-        // Try to find country in features or in context of the first feature
+        // 1. Find Country
         const countryFeature = features.find(f => f.properties.feature_type === 'country');
-        
         if (countryFeature) {
            countryCode = countryFeature.properties.context?.country?.country_code_alpha_3?.toUpperCase();
         } else if (features.length > 0) {
-           // Fallback: check context of the first feature
            countryCode = features[0].properties.context?.country?.country_code_alpha_3?.toUpperCase();
+        }
+
+        // 2. Find POI (Point of Interest)
+        const poiFeature = features.find(f => f.properties.feature_type === 'poi');
+        if (poiFeature) {
+          poiName = poiFeature.properties.name;
+          poiCategory = poiFeature.properties.poi_category?.[0]; // Get the primary category
+          console.log("Found POI:", poiName, "Category:", poiCategory);
         }
         
         console.log("Detected Country Code (ISO-A3):", countryCode);
       } catch (e) {
-        console.error("Geocoding failed, continuing without country code", e);
+        console.error("Geocoding failed, continuing without extra info", e);
       }
 
-      // 1. Upload the image to Storage
+      // ... existing photo upload code ...
       const response = await fetch(data.photo);
       const blob = await response.blob();
       
@@ -94,14 +102,13 @@ function App() {
 
       if (uploadError) throw uploadError;
 
-      // 2. Get Public URL
       const { data: publicURLData } = supabase.storage
         .from('stickers-photos')
         .getPublicUrl(fileName);
         
       const photoUrl = publicURLData.publicUrl;
 
-      // 3. Insert into Database
+      // 3. Insert into Database with enriched POI data
       const { error: dbError } = await supabase
         .from('stickers')
         .insert([
@@ -110,6 +117,8 @@ function App() {
             longitude: data.location.lng,
             photo_url: photoUrl,
             country_code: countryCode,
+            poi_name: poiName,
+            poi_category: poiCategory,
             user_id: user?.id,
             caption: data.caption
           }
