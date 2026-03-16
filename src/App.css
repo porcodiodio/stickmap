@@ -1,1 +1,15 @@
-/* Removing default Vite App.css styles */
+@keyframes scan {
+  0%, 100% { top: 0; }
+  50% { top: 100%; }
+}
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s ease-in-out infinite;
+}

@@ -51,8 +51,32 @@ CREATE TABLE IF NOT EXISTS public.stickers (
     country_code VARCHAR(3), -- Code pays ISO 3166-1 alpha-3 (ex: 'FRA', 'USA')
     photo_url TEXT,
     caption TEXT,
+    points INTEGER DEFAULT 10,
+    claim_code TEXT DEFAULT extensions.uuid_generate_v4(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- 3. Table des Claims (Collecte de points)
+CREATE TABLE IF NOT EXISTS public.sticker_claims (
+    id UUID DEFAULT extensions.uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    sticker_id UUID REFERENCES public.stickers(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, sticker_id) -- Un utilisateur ne peut claim un sticker qu'une seule fois
+);
+
+-- RLS pour les claims
+ALTER TABLE public.sticker_claims ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Claims visibles par tous" 
+ON public.sticker_claims FOR SELECT 
+TO public 
+USING (true);
+
+CREATE POLICY "Utilisateurs peuvent claim des stickers" 
+ON public.sticker_claims FOR INSERT 
+TO authenticated 
+WITH CHECK (auth.uid() = user_id);
 
 -- Index pour la recherche géographique (R-Tree recommandé si plus complexe, mais B-Tree suffit pour la base)
 CREATE INDEX IF NOT EXISTS idx_stickers_location ON public.stickers(latitude, longitude);

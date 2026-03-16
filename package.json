@@ -12,9 +12,11 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.99.1",
     "@turf/turf": "^7.3.4",
+    "@yudiel/react-qr-scanner": "^2.5.1",
     "axios": "^1.13.6",
     "lucide-react": "^0.577.0",
     "mapbox-gl": "^3.19.1",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-map-gl": "^7.1.6",

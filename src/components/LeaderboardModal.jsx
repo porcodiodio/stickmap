@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Trophy, X } from 'lucide-react';
+import { Trophy, X, Sparkles } from 'lucide-react';
 import UserProfileModal from './UserProfileModal';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -17,30 +17,52 @@ export default function LeaderboardModal({ isOpen, onClose }) {
   const fetchLeaderboard = async () => {
     setLoading(true);
     try {
-      // Fetch all stickers with user_id
+      // 1. Fetch all stickers with points
       const { data: stickersData } = await supabase
         .from('stickers')
-        .select('user_id')
+        .select('user_id, points')
         .not('user_id', 'is', null);
 
-      if (!stickersData || stickersData.length === 0) { setLeaderboard([]); return; }
+      // 2. Fetch all claims with stickers(points) joined
+      const { data: claimsData } = await supabase
+        .from('sticker_claims')
+        .select('user_id, stickers(points)');
 
-      // Count stickers per user
-      const counts = {};
-      stickersData.forEach(s => { counts[s.user_id] = (counts[s.user_id] || 0) + 1; });
+      // 3. Aggregate scores
+      const scores = {};
+      const stickerCounts = {};
+      
+      (stickersData || []).forEach(s => {
+        scores[s.user_id] = (scores[s.user_id] || 0) + (s.points || 10);
+        stickerCounts[s.user_id] = (stickerCounts[s.user_id] || 0) + 1;
+      });
+      
+      (claimsData || []).forEach(c => {
+        if (!c.user_id) return;
+        const pts = c.stickers?.points || 10;
+        scores[c.user_id] = (scores[c.user_id] || 0) + pts;
+      });
 
-      // Fetch profiles
-      const userIds = Object.keys(counts);
+      // 4. Fetch profiles
+      const userIds = Object.keys(scores);
+      if (userIds.length === 0) { setLeaderboard([]); return; }
+      
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, username, avatar_url')
         .in('id', userIds);
 
       const ranked = (profilesData || [])
-        .map(p => ({ ...p, count: counts[p.id] || 0 }))
-        .sort((a, b) => b.count - a.count);
+        .map(p => ({ 
+          ...p, 
+          score: scores[p.id] || 0,
+          count: stickerCounts[p.id] || 0
+        }))
+        .sort((a, b) => b.score - a.score);
 
       setLeaderboard(ranked);
+    } catch (err) {
+      console.error("Leaderboard fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -128,8 +150,12 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                     }`}>
                       {member.username || 'Anonyme'}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white/30 text-[10px] font-bold uppercase tracking-wider">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 text-[#ccff00] font-bold text-[10px] uppercase tracking-wider">
+                        <Sparkles size={10} />
+                        <span>{member.score} <span className="font-light">pts</span></span>
+                      </div>
+                      <span className="text-white/20 text-[10px] font-bold uppercase tracking-wider">
                         {member.count} <span className="font-light">sticker{member.count > 1 ? 's' : ''}</span>
                       </span>
                     </div>
@@ -138,13 +164,13 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                   {/* Progress Glow (Right side) */}
                   <div className="w-1 h-8 rounded-full bg-white/5 overflow-hidden">
                     <div 
-                      className={`w-full h-full rounded-full ${
+                      className={`w-full h-full rounded-full transition-all duration-1000 ${
                         index === 0 ? 'bg-yellow-400' : 
                         index === 1 ? 'bg-white/40' : 
                         index === 2 ? 'bg-amber-600' : 
                         'bg-white/10'
                       }`}
-                      style={{ height: `${(member.count / (leaderboard[0]?.count || 1)) * 100}%` }}
+                      style={{ height: `${(member.score / (leaderboard[0]?.score || 1)) * 100}%` }}
                     />
                   </div>
                 </button>

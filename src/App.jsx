@@ -8,6 +8,7 @@ import ProfileModal from './components/ProfileModal'
 import StickerDetailModal from './components/StickerDetailModal'
 import FeedModal from './components/FeedModal'
 import LeaderboardModal from './components/LeaderboardModal'
+import ClaimScannerModal from './components/ClaimScannerModal'
 import { supabase } from './lib/supabase'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isFeedOpen, setIsFeedOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -184,10 +186,13 @@ function App() {
             </svg>
           </button>
 
-          {/* 4. Placeholder - future feature */}
-          <button className="flex flex-col items-center gap-1 text-white/20 cursor-not-allowed">
+          {/* 4. Scanner */}
+          <button 
+            onClick={() => user ? setIsScannerOpen(true) : setIsAuthModalOpen(true)}
+            className="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all transform active:scale-90"
+          >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m0 11v1m4-12h1a2 2 0 012 2v1m-16 0V7a2 2 0 012-2h1m12 11v1a2 2 0 01-2 2h-1m-6 0H7a2 2 0 01-2-2v-1M8 12h8" />
             </svg>
           </button>
 
@@ -248,6 +253,15 @@ function App() {
       <LeaderboardModal
         isOpen={isLeaderboardOpen}
         onClose={() => setIsLeaderboardOpen(false)}
+      />
+
+      <ClaimScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onClaimSuccess={() => {
+          setRefreshTrigger(prev => prev + 1);
+          if (user) fetchProfile(user.id);
+        }}
       />
     </div>
   )

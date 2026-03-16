@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '../lib/supabase';
-import { X, Edit3, Trash2, Send, MapPin } from 'lucide-react';
+import { X, Edit3, Trash2, Send, MapPin, Sparkles, QrCode } from 'lucide-react';
 import EditStickerModal from './EditStickerModal';
 import UserProfileModal from './UserProfileModal';
 
@@ -147,6 +148,10 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
+              <Sparkles size={12} className="text-[#ccff00]" />
+              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PTS</span>
+            </div>
             {isOwner && (
               <button
                 onClick={() => setIsEditOpen(true)}
@@ -174,6 +179,27 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
           {sticker.caption && (
             <div className="glass-panel rounded-[24px] p-5 border-white/5 bg-white/[0.02]">
               <p className="text-white/80 font-light leading-relaxed italic">"{sticker.caption}"</p>
+            </div>
+          )}
+
+          {/* Gamification - QR Code (Owner only) */}
+          {isOwner && (
+            <div className="glass-panel rounded-[24px] p-6 border-white/5 bg-[#ccff00]/5 flex flex-col items-center gap-4">
+              <div className="flex items-center gap-2 mb-2">
+                <QrCode size={16} className="text-[#ccff00]" />
+                <h3 className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Code de Claim Unique</h3>
+              </div>
+              <div className="bg-white p-4 rounded-[20px] shadow-[0_0_30px_rgba(204,255,0,0.2)]">
+                <QRCodeSVG 
+                  value={sticker.claim_code} 
+                  size={140}
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-[10px] text-white/40 text-center max-w-[200px] leading-relaxed">
+                Montre ce QR code aux autres voyageurs pour qu'ils récupèrent les points !
+              </p>
             </div>
           )}
 

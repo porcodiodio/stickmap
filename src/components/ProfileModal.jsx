@@ -1,18 +1,41 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Camera, LogOut, X } from 'lucide-react';
+import { Camera, LogOut, X, Sparkles, MapPin, Trophy } from 'lucide-react';
 
 export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate }) {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({ stickers: 0, score: 0 });
 
   useEffect(() => {
     if (profile) {
       setUsername(profile.username || '');
     }
-  }, [profile]);
+    if (user) fetchStats();
+  }, [user, profile]);
+
+  const fetchStats = async () => {
+    try {
+      const [
+        { data: stickersData },
+        { data: claimsData }
+      ] = await Promise.all([
+        supabase.from('stickers').select('points').eq('user_id', user.id),
+        supabase.from('sticker_claims').select('stickers(points)').eq('user_id', user.id)
+      ]);
+
+      const sPoints = (stickersData || []).reduce((acc, s) => acc + (s.points || 10), 0);
+      const cPoints = (claimsData || []).reduce((acc, c) => acc + (c.stickers?.points || 10), 0);
+      setStats({
+        stickers: stickersData?.length || 0,
+        score: sPoints + cPoints
+      });
+    } catch (err) {
+      console.error("Stats fetch error:", err);
+    }
+  };
 
   if (!isOpen || !user) return null;
 
@@ -135,10 +158,23 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
               <input type="file" className="hidden" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
             </label>
           </div>
-          <h2 className="text-2xl font-light tracking-tight text-white mb-1">
+          <h2 className="text-2xl font-light tracking-tight text-white mb-3">
             Mon <span className="font-bold">Profil</span>
           </h2>
-          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Personnalisez votre identité</p>
+          
+          {/* Stats Bar */}
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
+              <Sparkles size={12} className="text-[#ccff00]" />
+              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{stats.score} Score</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+              <MapPin size={12} className="text-white/40" />
+              <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stats.stickers} stickers</span>
+            </div>
+          </div>
+          
+          <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Personnalisez votre identité</p>
         </div>
 
         {/* Form Body */}

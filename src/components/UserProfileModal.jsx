@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { X, MapPin, Trophy } from 'lucide-react';
+import { X, MapPin, Trophy, Sparkles } from 'lucide-react';
 import { computeAchievements } from '../lib/achievements';
 
 // Convert ISO 3166-1 alpha-3 -> alpha-2 for flag emojis
@@ -35,6 +35,7 @@ export default function UserProfileModal({ userId, onClose }) {
   const [profile, setProfile] = useState(null);
   const [countries, setCountries] = useState([]);
   const [stickerCount, setStickerCount] = useState(0);
+  const [score, setScore] = useState(0);
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,17 +49,24 @@ export default function UserProfileModal({ userId, onClose }) {
       const [
         { data: profileData },
         { data: stickersData },
-        { count: commentCount }
+        { count: commentCount },
+        { data: claimsData }
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('stickers').select('country_code').eq('user_id', userId),
+        supabase.from('stickers').select('country_code, points').eq('user_id', userId),
         supabase.from('sticker_comments').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+        supabase.from('sticker_claims').select('sticker_id, stickers(points)').eq('user_id', userId)
       ]);
 
       setProfile(profileData);
 
       const count = stickersData?.length || 0;
       setStickerCount(count);
+
+      // Points calculation
+      const stickersPoints = (stickersData || []).reduce((acc, s) => acc + (s.points || 10), 0);
+      const claimsPoints = (claimsData || []).reduce((acc, c) => acc + (c.stickers?.points || 10), 0);
+      setScore(stickersPoints + claimsPoints);
 
       const uniqueCodes = [...new Set((stickersData || []).map(s => s.country_code).filter(Boolean))];
       setCountries(uniqueCodes);
@@ -109,14 +117,18 @@ export default function UserProfileModal({ userId, onClose }) {
               <h2 className="text-3xl font-light tracking-tight text-white mb-2">
                 <span className="font-bold">{profile?.username || 'Explorateur'}</span>
               </h2>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
+                  <Sparkles size={12} className="text-[#ccff00]" />
+                  <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{score} Score</span>
+                </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                  <MapPin size={12} className="text-[#ccff00]" />
-                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stickerCount} sticker{stickerCount > 1 ? 's' : ''}</span>
+                  <MapPin size={12} className="text-white/40" />
+                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stickerCount} stickers</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
                   <Trophy size={12} className="text-yellow-400" />
-                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{unlockedCount}/{achievements.length} succès</span>
+                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{unlockedCount}/{achievements.length}</span>
                 </div>
               </div>
             </div>
