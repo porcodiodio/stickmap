@@ -88,9 +88,9 @@ export default function LeaderboardModal({ isOpen, onClose }) {
             <Trophy size={24} className="text-yellow-400 opacity-90" />
           </div>
           <h2 className="text-2xl font-light tracking-tight text-white mb-1">
-            Top <span className="font-bold">Explorateurs</span>
+            Top <span className="font-bold">Stickerinos</span>
           </h2>
-          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Les plus grands colleurs de stickers</p>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">Nos plus gros colleurs</p>
         </div>
 
         {/* Leaderboard Body */}
