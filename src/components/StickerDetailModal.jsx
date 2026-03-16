@@ -114,20 +114,12 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
       <div className="bg-[#0a0a0a] w-full max-w-lg rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
-        {/* Close Button - Floating */}
-        <button 
-          onClick={onClose} 
-          className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Header - Author Info */}
+        {/* Header - Author Info & Actions */}
         <div className="px-6 pt-8 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
-              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer"
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer flex-shrink-0"
             >
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -137,30 +129,38 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
                 </div>
               )}
             </button>
-            <div>
-              <p className="text-white font-medium tracking-tight">
+            <div className="min-w-0">
+              <p className="text-white font-medium tracking-tight truncate">
                 {profile?.username || 'Anonyme'}
               </p>
               <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest mt-0.5">
                 {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
             </div>
+            
+            {/* Points Badge moved next to pseudo */}
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20 flex-shrink-0 ml-1">
+              <Sparkles size={12} className="text-[#ccff00]" />
+              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PUNTOS</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
-              <Sparkles size={12} className="text-[#ccff00]" />
-              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PTS</span>
-            </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
             {isOwner && (
               <button
                 onClick={() => setIsEditOpen(true)}
-                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/60 border border-white/5"
+                className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/60 border border-white/5 shadow-xl"
                 title="Éditer"
               >
                 <Edit3 size={18} />
               </button>
             )}
+            <button 
+              onClick={onClose} 
+              className="p-2.5 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 border border-white/5 shadow-xl"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
 
