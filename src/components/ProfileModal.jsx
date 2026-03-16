@@ -159,10 +159,6 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
               <input type="file" className="hidden" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
             </label>
           </div>
-          <h2 className="text-2xl font-light tracking-tight text-white mb-4">
-            Mon <span className="font-bold">Profil</span>
-          </h2>
-
           {/* Username Display/Edit */}
           <div className="mb-6 w-full flex flex-col items-center">
             {isEditing ? (
@@ -186,12 +182,12 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 group cursor-pointer" onClick={() => setIsEditing(true)}>
-                <h2 className="text-2xl font-bold tracking-tight text-white">
+              <div className="flex items-center justify-center gap-3 group cursor-pointer" onClick={() => setIsEditing(true)}>
+                <h2 className="text-3xl font-bold tracking-tight text-white group-hover:text-[#ccff00] transition-colors">
                   {profile?.username || 'Anonyme'}
                 </h2>
-                <button className="p-1.5 bg-white/5 rounded-full text-white/30 group-hover:text-white/60 group-hover:bg-white/10 transition-all">
-                  <Edit2 size={14} />
+                <button className="p-2 bg-white/5 rounded-full text-white/30 group-hover:text-white/60 group-hover:bg-white/10 transition-all shadow-xl border border-white/5">
+                  <Edit2 size={16} />
                 </button>
               </div>
             )}
