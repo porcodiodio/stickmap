@@ -1,3 +1,13 @@
+@keyframes splash-pop {
+  0% { transform: scale(0.6) rotate(-10deg); opacity: 0; filter: blur(10px); }
+  60% { transform: scale(1.1) rotate(2deg); opacity: 1; filter: blur(0px); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.animate-splash-pop {
+  animation: splash-pop 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 @keyframes scan {
   0%, 100% { top: 0; }
   50% { top: 100%; }
