@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { Flame, X } from 'lucide-react';
 import UserProfileModal from './UserProfileModal';
 import { getFlagEmoji } from '../lib/countryUtils';
