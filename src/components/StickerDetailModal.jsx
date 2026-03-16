@@ -115,11 +115,11 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
       <div className="bg-[#0a0a0a] w-full max-w-lg rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
         {/* Header - Author Info & Actions */}
-        <div className="px-6 pt-8 pb-4 flex items-start justify-between gap-4">
+        <div className="px-6 pt-10 pb-4 flex items-start justify-between gap-6">
           <div className="flex items-start gap-3 min-w-0">
             <button
               onClick={() => sticker.user_id && setViewingUserId(sticker.user_id)}
-              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer flex-shrink-0 mt-1"
+              className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg hover:scale-110 transition-all cursor-pointer flex-shrink-0"
             >
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -129,24 +129,24 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
                 </div>
               )}
             </button>
-            <div className="min-w-0 flex flex-col gap-2">
-              <p className="text-xl font-bold text-white tracking-tight truncate leading-tight">
+            <div className="min-w-0 flex flex-col gap-2.5">
+              <p className="text-xl font-bold text-white tracking-tight truncate leading-none">
                 {profile?.username || 'Anonyme'}
               </p>
               <div className="flex items-center gap-3">
-                <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest">
+                <p className="text-white/20 text-[10px] uppercase font-bold tracking-widest whitespace-nowrap">
                   {new Date(sticker.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </p>
-                {/* Points Badge - Moved below username for safety and better vertical flow */}
+                {/* Points Badge */}
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20 flex-shrink-0">
                   <Sparkles size={10} className="text-[#ccff00]" />
-                  <span className="text-[9px] text-[#ccff00] font-bold uppercase tracking-widest">{sticker.points || 10} PUNTOS</span>
+                  <span className="text-[9px] text-[#ccff00] font-bold uppercase tracking-widest leading-none">{sticker.points || 10} PUNTOS</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+          <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
             {isOwner && (
               <button
                 onClick={() => setIsEditOpen(true)}
