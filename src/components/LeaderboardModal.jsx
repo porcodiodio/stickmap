@@ -153,10 +153,10 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1 text-[#ccff00] font-bold text-[10px] uppercase tracking-wider">
                         <Sparkles size={10} />
-                        <span>{member.score} <span className="font-light">pts</span></span>
+                        <span>{member.score} <span className="font-light">puntos</span></span>
                       </div>
                       <span className="text-white/20 text-[10px] font-bold uppercase tracking-wider">
-                        {member.count} <span className="font-light">sticker{member.count > 1 ? 's' : ''}</span>
+                        {member.count} <span className="font-light">stickos</span>
                       </span>
                     </div>
                   </div>

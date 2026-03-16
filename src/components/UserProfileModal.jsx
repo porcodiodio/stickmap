@@ -120,11 +120,11 @@ export default function UserProfileModal({ userId, onClose }) {
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
                   <Sparkles size={12} className="text-[#ccff00]" />
-                  <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{score} Score</span>
+                  <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{score} puntos</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
                   <MapPin size={12} className="text-white/40" />
-                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stickerCount} stickers</span>
+                  <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stickerCount} stickos</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
                   <Trophy size={12} className="text-yellow-400" />

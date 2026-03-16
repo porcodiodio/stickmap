@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Camera, LogOut, X, Sparkles, MapPin, Trophy } from 'lucide-react';
+import { Camera, LogOut, X, Sparkles, MapPin, Trophy, Edit2, Check } from 'lucide-react';
 
 export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate }) {
   const [username, setUsername] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
@@ -39,8 +40,8 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
 
   if (!isOpen || !user) return null;
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const handleUpdateUsername = async () => {
+    if (!username.trim()) return;
     setLoading(true);
     setError(null);
 
@@ -54,8 +55,8 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
         });
 
       if (error) throw error;
+      setIsEditing(false);
       onUpdate();
-      alert("Profil mis à jour !");
     } catch (err) {
       console.error("Pseudo update error:", err);
       setError(err.message);
@@ -158,54 +159,62 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
               <input type="file" className="hidden" accept="image/*" onChange={uploadAvatar} disabled={uploading} />
             </label>
           </div>
-          <h2 className="text-2xl font-light tracking-tight text-white mb-3">
+          <h2 className="text-2xl font-light tracking-tight text-white mb-4">
             Mon <span className="font-bold">Profil</span>
           </h2>
+
+          {/* Username Display/Edit */}
+          <div className="mb-6 w-full flex flex-col items-center">
+            {isEditing ? (
+              <div className="flex items-center gap-2 w-full max-w-[240px]">
+                <div className="flex-1 glass-panel rounded-full px-4 py-2 border-white/20 bg-white/5">
+                  <input
+                    autoFocus
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-transparent border-none outline-none text-white text-center font-medium"
+                    placeholder="Pseudo..."
+                  />
+                </div>
+                <button 
+                  onClick={handleUpdateUsername}
+                  disabled={loading}
+                  className="p-2 bg-[#ccff00] text-black rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {loading ? <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : <Check size={18} />}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2 group cursor-pointer" onClick={() => setIsEditing(true)}>
+                <h2 className="text-2xl font-bold tracking-tight text-white">
+                  {profile?.username || 'Anonyme'}
+                </h2>
+                <button className="p-1.5 bg-white/5 rounded-full text-white/30 group-hover:text-white/60 group-hover:bg-white/10 transition-all">
+                  <Edit2 size={14} />
+                </button>
+              </div>
+            )}
+          </div>
           
           {/* Stats Bar */}
-          <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-6">
             <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
               <Sparkles size={12} className="text-[#ccff00]" />
-              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{stats.score} Score</span>
+              <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{stats.score} puntos</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
               <MapPin size={12} className="text-white/40" />
-              <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stats.stickers} stickers</span>
+              <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stats.stickers} stickos</span>
             </div>
           </div>
           
-          <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Personnalisez votre identité</p>
+          <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Milano Stickerini Explorer</p>
         </div>
 
-        {/* Form Body */}
         <div className="px-8 pb-10 overflow-y-auto space-y-8">
-          <form onSubmit={handleUpdate} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold ml-2">Pseudo</label>
-              <div className="glass-panel rounded-[24px] p-1 border-white/5 focus-within:border-white/20 transition-all">
-                <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 bg-transparent outline-none text-white placeholder-white/10 font-light"
-                  placeholder="Choisissez un pseudo..."
-                />
-              </div>
-            </div>
-
-            {error && <p className="text-red-400 text-[10px] text-center font-bold tracking-tight bg-red-400/10 py-2 rounded-full border border-red-400/20">{error}</p>}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-white text-black font-bold py-4 rounded-full transition-all shadow-[0_15px_30px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-20 flex items-center justify-center gap-2"
-            >
-              {loading && <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>}
-              SAUVEGARDER
-            </button>
-          </form>
-
+          {error && <p className="text-red-400 text-[10px] text-center font-bold tracking-tight bg-red-400/10 py-2 rounded-full border border-red-400/20">{error}</p>}
+          
           <div className="pt-4 border-t border-white/5">
             <button
               onClick={handleLogout}
