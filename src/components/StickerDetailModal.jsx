@@ -182,27 +182,6 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
             </div>
           )}
 
-          {/* Gamification - QR Code (Owner only) */}
-          {isOwner && (
-            <div className="glass-panel rounded-[24px] p-6 border-white/5 bg-[#ccff00]/5 flex flex-col items-center gap-4">
-              <div className="flex items-center gap-2 mb-2">
-                <QrCode size={16} className="text-[#ccff00]" />
-                <h3 className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Code de Claim Unique</h3>
-              </div>
-              <div className="bg-white p-4 rounded-[20px] shadow-[0_0_30px_rgba(204,255,0,0.2)]">
-                <QRCodeSVG 
-                  value={sticker.claim_code} 
-                  size={140}
-                  level="H"
-                  includeMargin={false}
-                />
-              </div>
-              <p className="text-[10px] text-white/40 text-center max-w-[200px] leading-relaxed">
-                Montre ce QR code aux autres voyageurs pour qu'ils récupèrent les points !
-              </p>
-            </div>
-          )}
-
           {/* Comments Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between px-2">
