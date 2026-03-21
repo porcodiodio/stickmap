@@ -21,8 +21,8 @@ export default function ClaimScannerModal({ isOpen, onClose, onClaimSuccess }) {
     setStatus('processing');
     
     try {
-      // 1. Get current user
-      const { data: { user } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) {
         setStatus('error');
         setMessage('Vous devez être connecté pour collecter des puntos.');
