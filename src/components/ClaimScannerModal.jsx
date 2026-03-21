@@ -138,7 +138,7 @@ export default function ClaimScannerModal({ isOpen, onClose, onClaimSuccess }) {
                   <Scanner
                     onScan={handleScan}
                     allowMultiple={false}
-                    audio={false}
+                    sound={false}
                     styles={{ container: { width: '100%', height: '100%' } }}
                     components={{
                         audio: false,
