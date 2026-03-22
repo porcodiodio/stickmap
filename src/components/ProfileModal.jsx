@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Camera, LogOut, X, Sparkles, MapPin, Trophy, Edit2, Check } from 'lucide-react';
+import { computeAchievements } from '../lib/achievements';
+import { getFlagEmoji } from '../lib/countryUtils';
 
 export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate }) {
   const [username, setUsername] = useState('');
@@ -9,6 +11,8 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({ stickers: 0, score: 0 });
+  const [countries, setCountries] = useState([]);
+  const [achievements, setAchievements] = useState([]);
 
   useEffect(() => {
     if (profile) {
@@ -21,10 +25,12 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
     try {
       const [
         { data: stickersData },
+        { count: commentCount },
         { data: claimsData },
         { data: physicalClaimsData }
       ] = await Promise.all([
-        supabase.from('stickers').select('points').eq('user_id', user.id),
+        supabase.from('stickers').select('country_code, points').eq('user_id', user.id),
+        supabase.from('sticker_comments').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('sticker_claims').select('stickers(points)').eq('user_id', user.id),
         supabase.from('physical_qr_claims').select('physical_qrcodes(points)').eq('user_id', user.id)
       ]);
@@ -37,12 +43,25 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
         stickers: stickersData?.length || 0,
         score: sPoints + cPoints + pPoints
       });
+
+      const uniqueCodes = [...new Set((stickersData || []).map(s => s.country_code).filter(Boolean))];
+      setCountries(uniqueCodes);
+
+      // Compute achievements
+      const computed = computeAchievements({
+        stickerCount: stickersData?.length || 0,
+        countryCodes: uniqueCodes,
+        commentCount: commentCount || 0,
+      });
+      setAchievements(computed);
     } catch (err) {
       console.error("Stats fetch error:", err);
     }
   };
 
   if (!isOpen || !user) return null;
+
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
 
   const handleUpdateUsername = async () => {
     if (!username.trim()) return;
@@ -198,7 +217,7 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
           </div>
           
           {/* Stats Bar */}
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
             <div className="flex items-center gap-1.5 px-3 py-1 bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
               <Sparkles size={12} className="text-[#ccff00]" />
               <span className="text-[10px] text-[#ccff00] font-bold uppercase tracking-widest">{stats.score} puntos</span>
@@ -207,12 +226,59 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
               <MapPin size={12} className="text-white/40" />
               <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{stats.stickers} stickos</span>
             </div>
+            {achievements.length > 0 && (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                <Trophy size={12} className="text-yellow-400" />
+                <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{unlockedCount}/{achievements.length}</span>
+              </div>
+            )}
           </div>
-          
-          <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Milano Stickerini Explorer</p>
         </div>
 
-        <div className="px-8 pb-10 overflow-y-auto space-y-8">
+        <div className="flex-1 overflow-y-auto px-8 pb-10 space-y-8">
+          
+          {/* Countries Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Pays explorés ({countries.length})</h3>
+            </div>
+            <div className="glass-panel rounded-[24px] p-4 border-white/5 bg-white/[0.02] flex flex-wrap gap-2">
+              {countries.length === 0 ? (
+                <p className="text-white/20 text-xs italic font-light">Pas encore d'exploration...</p>
+              ) : (
+                countries.map(code => (
+                  <div key={code} className="text-2xl hover:scale-125 transition-transform" title={code}>
+                    {getFlagEmoji(code)}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Achievements Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Succès débloqués</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {achievements.map((ach) => (
+                <div 
+                  key={ach.id}
+                  className={`aspect-square rounded-[24px] p-3 flex flex-col items-center justify-center text-center gap-2 border transition-all ${
+                    ach.unlocked 
+                      ? 'bg-white/5 border-white/10 shadow-[0_10px_20px_rgba(255,255,255,0.03)]' 
+                      : 'bg-black/20 border-white/5 opacity-30 grayscale'
+                  }`}
+                >
+                  <span className={`text-2xl ${ach.unlocked ? 'animate-bounce-subtle' : ''}`}>{ach.icon}</span>
+                  <span className={`text-[9px] font-bold uppercase tracking-tighter leading-tight ${ach.unlocked ? 'text-white' : 'text-white/40'}`}>
+                    {ach.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {error && <p className="text-red-400 text-[10px] text-center font-bold tracking-tight bg-red-400/10 py-2 rounded-full border border-red-400/20">{error}</p>}
           
           <div className="pt-4 border-t border-white/5">
