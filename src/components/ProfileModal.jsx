@@ -27,18 +27,24 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
         { data: stickersData },
         { count: commentCount },
         { data: claimsData },
-        { data: physicalClaimsData }
+        { data: physicalClaimsData },
+        { data: otherStickersData }
       ] = await Promise.all([
-        supabase.from('stickers').select('country_code, points').eq('user_id', user.id),
+        // Grab everything needed for geographical achievements
+        supabase.from('stickers').select('latitude, longitude, country_code, points, poi_category, poi_name, created_at').eq('user_id', user.id),
         supabase.from('sticker_comments').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('sticker_claims').select('stickers(points)').eq('user_id', user.id),
-        supabase.from('physical_qr_claims').select('physical_qrcodes(points)').eq('user_id', user.id)
+        supabase.from('physical_qr_claims').select('physical_qrcodes(points)').eq('user_id', user.id),
+        // Just latch onto other stickers coordinates for the rivalry achievement
+        supabase.from('stickers').select('latitude, longitude').neq('user_id', user.id)
       ]);
 
       const sPoints = (stickersData || []).reduce((acc, s) => acc + (s.points || 10), 0);
       const cPoints = (claimsData || []).reduce((acc, c) => acc + (c.stickers?.points || 10), 0);
       const pPoints = (physicalClaimsData || []).reduce((acc, p) => acc + (p.physical_qrcodes?.points || 10), 0);
       
+      const claimsCount = (claimsData?.length || 0) + (physicalClaimsData?.length || 0);
+
       setStats({
         stickers: stickersData?.length || 0,
         score: sPoints + cPoints + pPoints
@@ -49,8 +55,9 @@ export default function ProfileModal({ isOpen, onClose, user, profile, onUpdate 
 
       // Compute achievements
       const computed = computeAchievements({
-        stickerCount: stickersData?.length || 0,
-        countryCodes: uniqueCodes,
+        stickers: stickersData || [],
+        otherStickers: otherStickersData || [],
+        claimsCount: claimsCount,
         commentCount: commentCount || 0,
       });
       setAchievements(computed);
