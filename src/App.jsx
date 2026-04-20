@@ -11,6 +11,7 @@ import FeedModal from './components/FeedModal'
 import LeaderboardModal from './components/LeaderboardModal'
 import ClaimScannerModal from './components/ClaimScannerModal'
 import SplashScreen from './components/SplashScreen'
+import SetupProfileModal from './components/SetupProfileModal'
 import { supabase } from './lib/supabase'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
   const [isFeedOpen, setIsFeedOpen] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isSetupProfileOpen, setIsSetupProfileOpen] = useState(false);
   const [selectedSticker, setSelectedSticker] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -54,8 +56,26 @@ function App() {
   }, []);
 
   const fetchProfile = async (userId) => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    if (data) setProfile(data);
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (data) {
+      setProfile(data);
+    } else if (error && error.code === 'PGRST116') {
+      // Si le profil n'existe pas encore (ex: après un login Google/OTP), on le laisse vide
+      // pour déclencher le SetupProfileModal
+      setProfile({ id: userId, username: null });
+    }
+  };
+
+  const handleProtectedAction = (actionCallback) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (!profile?.username) {
+      setIsSetupProfileOpen(true);
+      return;
+    }
+    actionCallback();
   };
 
   const handleAddSticker = async (data) => {
@@ -195,7 +215,7 @@ function App() {
 
           {/* 3. Add Sticker (center CTA) */}
           <button
-            onClick={() => user ? setIsAddModalOpen(true) : setIsAuthModalOpen(true)}
+            onClick={() => handleProtectedAction(() => setIsAddModalOpen(true))}
             className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:scale-110 active:scale-95 transition-all outline-none border-none group"
           >
             <Plus size={28} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -203,7 +223,7 @@ function App() {
 
           {/* 4. Scanner */}
           <button 
-            onClick={() => user ? setIsScannerOpen(true) : setIsAuthModalOpen(true)}
+            onClick={() => handleProtectedAction(() => setIsScannerOpen(true))}
             className="flex flex-col items-center gap-1 transition-all transform active:scale-90 group"
           >
             <QrCode size={22} className="text-[#ccff00]/80 group-hover:text-[#ccff00] transition-colors group-hover:drop-shadow-[0_0_8px_rgba(204,255,0,0.4)]" />
@@ -273,6 +293,15 @@ function App() {
         onClose={() => setIsScannerOpen(false)}
         onClaimSuccess={() => {
           setRefreshTrigger(prev => prev + 1);
+          if (user) fetchProfile(user.id);
+        }}
+      />
+
+      <SetupProfileModal
+        isOpen={isSetupProfileOpen}
+        onClose={() => setIsSetupProfileOpen(false)}
+        user={user}
+        onProfileUpdated={() => {
           if (user) fetchProfile(user.id);
         }}
       />
