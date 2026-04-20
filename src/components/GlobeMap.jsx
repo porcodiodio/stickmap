@@ -3,6 +3,7 @@ import Map, { Source, Layer, Marker } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import countriesData from '../data/countries.geojson?url';
 import { supabase } from '../lib/supabase';
+import { getThumbnailUrl } from '../lib/imageUtils';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -143,7 +144,7 @@ const GlobeMap = forwardRef(({ refreshTrigger, onSelectSticker }, ref) => {
           >
             <div className="group cursor-pointer transform transition-all hover:scale-110 relative z-10">
               <div className="w-12 h-12 glass-panel rounded-full p-1 shadow-[0_0_20px_rgba(255,113,206,0.3)] overflow-hidden shrink-0 border-[#ff71ce]/50">
-                <img src={sticker.photo_url} alt="Sticker" className="w-full h-full object-cover rounded-full" />
+                <img src={getThumbnailUrl(sticker.photo_url)} alt="Sticker" className="w-full h-full object-cover rounded-full" loading="lazy" decoding="async" />
               </div>
               {/* Vibrant pink glow */}
               <div className="absolute -inset-1 rounded-full bg-[#ff71ce]/20 blur-md -z-10 opacity-60 group-hover:opacity-100 transition-opacity"></div>

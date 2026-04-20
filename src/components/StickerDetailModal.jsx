@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getDetailUrl } from '../lib/imageUtils';
 import { QRCodeSVG } from 'qrcode.react';
 import { supabase } from '../lib/supabase';
 import { X, Edit3, Trash2, Send, MapPin, Sparkles, QrCode } from 'lucide-react';
@@ -169,7 +170,7 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
         <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
           {/* Photo Container */}
           <div className="w-full aspect-square sm:aspect-video rounded-[24px] overflow-hidden border border-white/5 bg-black/40 group relative">
-            <img src={sticker.photo_url} alt="Sticker" className="w-full h-full object-contain" />
+            <img src={getDetailUrl(sticker.photo_url)} alt="Sticker" className="w-full h-full object-contain" decoding="async" />
             <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-2">
               <MapPin size={12} className="text-[#ccff00]" />
               <span className="text-[10px] text-white/80 font-bold uppercase tracking-widest">{sticker.country_code || '📍 Monde'}</span>
