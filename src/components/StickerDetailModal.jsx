@@ -21,6 +21,7 @@ export default function StickerDetailModal({ isOpen, onClose, sticker, currentUs
 
   useEffect(() => {
     if (sticker) {
+      setProfile(null);
       if (sticker.user_id) fetchProfile();
       fetchComments();
     }
