@@ -1,11 +1,20 @@
-import { useState } from 'react';
-import { Camera, MapPin, X, Upload } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Camera, ImageIcon, MapPin, X, Upload, RefreshCw } from 'lucide-react';
 
 export default function AddStickerModal({ onClose, onAdd }) {
   const [photo, setPhoto] = useState(null);
   const [caption, setCaption] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [location, setLocation] = useState(null);
+
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setPhoto(URL.createObjectURL(e.target.files[0]));
+    }
+  };
 
   const handleGetLocation = () => {
     setIsLocating(true);
@@ -36,7 +45,6 @@ export default function AddStickerModal({ onClose, onAdd }) {
       alert("Veuillez ajouter une photo et votre position.");
       return;
     }
-    // TODO: Send to Supabase
     onAdd({ photo, location, caption });
     onClose();
   };
@@ -45,7 +53,24 @@ export default function AddStickerModal({ onClose, onAdd }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in slide-in-from-bottom duration-300 pb-safe">
       <div className="bg-[#0a0a0a] w-full max-w-md rounded-[32px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden flex flex-col max-h-[90vh] mesh-gradient relative">
         
-        {/* Close Button - Floating */}
+        {/* Hidden file inputs */}
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        {/* Close Button */}
         <button 
           onClick={onClose} 
           className="absolute top-6 right-6 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-all text-white/40 z-20 border border-white/5"
@@ -64,34 +89,81 @@ export default function AddStickerModal({ onClose, onAdd }) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="px-8 pb-10 overflow-y-auto space-y-8">
-          
-          {/* Photo Upload Area */}
+        <form onSubmit={handleSubmit} className="px-8 pb-10 overflow-y-auto space-y-5">
+
+          {/* Photo Section */}
           <div className="space-y-3">
-            <div className="w-full h-52 glass-card border-dashed border-white/20 bg-white/[0.02] hover:bg-white/[0.05] transition-all flex flex-col items-center justify-center cursor-pointer group relative overflow-hidden">
-              <input 
-                type="file" 
-                accept="image/*"
-                capture="environment"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                onChange={(e) => {
-                  if(e.target.files && e.target.files[0]) {
-                    setPhoto(URL.createObjectURL(e.target.files[0]));
-                  }
-                }}
-              />
-              {photo ? (
+
+            {/* Preview */}
+            {photo && (
+              <div className="relative w-full h-52 rounded-[20px] overflow-hidden border border-white/10">
                 <img src={photo} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
-              ) : (
-                <>
-                  <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform border border-white/10">
-                    <Camera size={26} className="opacity-60" />
+                <button
+                  type="button"
+                  onClick={() => setPhoto(null)}
+                  className="absolute top-3 right-3 p-1.5 bg-black/60 backdrop-blur-sm rounded-full text-white/70 hover:text-white border border-white/10 transition-all"
+                >
+                  <RefreshCw size={15} />
+                </button>
+              </div>
+            )}
+
+            {/* Pick source buttons */}
+            {!photo && (
+              <div className="grid grid-cols-2 gap-3">
+                {/* Camera live */}
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="glass-panel rounded-[20px] p-5 flex flex-col items-center gap-3 border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all group cursor-pointer"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
+                    <Camera size={22} className="text-white/60 group-hover:text-white transition-colors" />
                   </div>
-                  <span className="text-white/80 font-medium">Ajouter une photo</span>
-                  <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">ou parcourir la galerie</span>
-                </>
-              )}
-            </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-white/80">Appareil photo</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Live</p>
+                  </div>
+                </button>
+
+                {/* Gallery */}
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="glass-panel rounded-[20px] p-5 flex flex-col items-center gap-3 border-white/5 hover:border-white/20 hover:bg-white/[0.05] transition-all group cursor-pointer"
+                >
+                  <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
+                    <ImageIcon size={22} className="text-white/60 group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-white/80">Galerie</p>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Bibliothèque</p>
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Re-pick button when photo is set */}
+            {photo && (
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setPhoto(null); setTimeout(() => cameraInputRef.current?.click(), 50); }}
+                  className="glass-panel rounded-[16px] py-3 flex items-center justify-center gap-2 border-white/5 hover:border-white/20 transition-all text-white/50 hover:text-white/80 text-sm"
+                >
+                  <Camera size={16} />
+                  <span>Reprendre</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setPhoto(null); setTimeout(() => galleryInputRef.current?.click(), 50); }}
+                  className="glass-panel rounded-[16px] py-3 flex items-center justify-center gap-2 border-white/5 hover:border-white/20 transition-all text-white/50 hover:text-white/80 text-sm"
+                >
+                  <ImageIcon size={16} />
+                  <span>Galerie</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Caption Area */}
@@ -113,11 +185,15 @@ export default function AddStickerModal({ onClose, onAdd }) {
           >
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${location ? 'bg-[#ccff00] text-black shadow-[0_0_20px_rgba(204,255,0,0.4)]' : 'bg-white/5 text-white/40 border border-white/10'}`}>
-                <MapPin size={22} />
+                {isLocating ? (
+                  <div className="w-5 h-5 border-2 border-black/40 border-t-black rounded-full animate-spin" />
+                ) : (
+                  <MapPin size={22} />
+                )}
               </div>
               <div>
                 <p className={`font-medium transition-colors ${location ? 'text-[#ccff00]' : 'text-white/60'}`}>
-                  {location ? 'Position verrouillée' : 'Géolocalisation'}
+                  {isLocating ? 'Localisation...' : location ? 'Position verrouillée' : 'Géolocalisation'}
                 </p>
                 {location && (
                   <p className="text-[10px] text-[#ccff00]/50 font-mono tracking-tighter">
@@ -126,9 +202,6 @@ export default function AddStickerModal({ onClose, onAdd }) {
                 )}
               </div>
             </div>
-            {isLocating && (
-              <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
-            )}
           </div>
 
           {/* Submit Action */}

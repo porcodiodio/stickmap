@@ -195,7 +195,7 @@ function App() {
 
           {/* 3. Add Sticker (center CTA) */}
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => user ? setIsAddModalOpen(true) : setIsAuthModalOpen(true)}
             className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.3)] transform hover:scale-110 active:scale-95 transition-all outline-none border-none group"
           >
             <Plus size={28} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-300" />
