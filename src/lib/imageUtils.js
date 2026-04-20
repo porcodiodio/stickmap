@@ -12,12 +12,18 @@
 export function getOptimizedUrl(url, { width, height, quality = 80, resize = 'cover' } = {}) {
   if (!url) return url;
 
-  // Les URLs Supabase Storage ont la forme :
-  // https://<project>.supabase.co/storage/v1/object/public/<bucket>/<file>
-  // La transformation se fait via le endpoint /render/image :
-  // https://<project>.supabase.co/storage/v1/render/image/public/<bucket>/<file>?width=...
   try {
     const urlObj = new URL(url);
+
+    // La transformation Supabase ne fonctionne que pour les images hébergées
+    // sur Supabase Storage. Si l'URL vient d'un autre hébergeur (goopics, etc.),
+    // on retourne l'URL originale sans modification.
+    const isSupabaseStorage =
+      urlObj.hostname.endsWith('.supabase.co') &&
+      urlObj.pathname.includes('/storage/v1/object/public/');
+
+    if (!isSupabaseStorage) return url;
+
     // Remplace /object/public/ par /render/image/public/
     urlObj.pathname = urlObj.pathname.replace('/object/public/', '/render/image/public/');
 
