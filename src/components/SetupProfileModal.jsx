@@ -52,7 +52,7 @@ export default function SetupProfileModal({ isOpen, onClose, user, onProfileUpda
             <User size={24} />
           </div>
           <h2 className="text-2xl font-light tracking-tight text-white mb-1">
-            Qui es-tu <span className="font-bold">voyageur</span> ?
+            C'est <span className="font-bold">qui là?!</span>
           </h2>
           <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold leading-relaxed px-4 mt-2">
             Choisis un pseudo pour signer tes points sur la carte
